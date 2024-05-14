@@ -1,6 +1,7 @@
 import { expect } from '@jest/globals';
 import { installSnap } from '@metamask/snaps-jest';
-import { panel, text } from '@metamask/snaps-sdk';
+
+import { SnapViewModels } from './snap-view-models/snap-vm';
 
 describe('onRpcRequest', () => {
   describe('hello', () => {
@@ -15,15 +16,7 @@ describe('onRpcRequest', () => {
 
       const ui = await response.getInterface();
       expect(ui.type).toBe('confirmation');
-      expect(ui).toRender(
-        panel([
-          text(`Hello, **${origin}**!`),
-          text('This custom confirmation is just for display purposes.'),
-          text(
-            'But you can edit the snap source code to make it do something, if you want to!',
-          ),
-        ]),
-      );
+      expect(ui).toRender(SnapViewModels.helloViewModel(origin));
 
       await ui.ok();
 
