@@ -6,3 +6,14 @@ export type Snap = {
   version: string;
   initialPermissions: Record<string, unknown>;
 };
+
+export type UserCredentials = {
+  username: string;
+  password: string;
+};
+
+export type BasicCredsDisplayHandle = {
+  setUser: (user: string) => void;
+  setPassword: (password: string) => void;
+  getDescription: () => string;
+};

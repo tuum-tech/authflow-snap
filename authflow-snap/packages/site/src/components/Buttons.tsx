@@ -1,4 +1,5 @@
 import type { ComponentProps } from 'react';
+import { forwardRef, useImperativeHandle, useEffect, useState } from 'react';
 import styled from 'styled-components';
 
 import { ReactComponent as FlaskFox } from '../assets/flask_fox.svg';
@@ -98,6 +99,43 @@ export const ReconnectButton = (props: ComponentProps<typeof Button>) => {
 export const SendHelloButton = (props: ComponentProps<typeof Button>) => {
   return <Button {...props}>Send message</Button>;
 };
+
+export const GetBasicCredsButton = (props: ComponentProps<typeof Button>) => {
+  return <Button {...props}>Get Basic Credentials</Button>;
+};
+
+export const BasicCredsDisplay = forwardRef((props, ref) => {
+  const [user, setUser] = useState<string>('Loading...');
+  const [password, setPassword] = useState<string>('Loading...');
+  const [description, setDescription] = useState<string>('');
+
+  useImperativeHandle(ref, () => ({
+    setUser: (newUser: string) => setUser(newUser),
+    setPassword: (newPassword: string) => setPassword(newPassword),
+    getDescription: () => description,
+  }));
+
+  const handleDescriptionChange = (
+    // eslint-disable-next-line @typescript-eslint/no-shadow
+    event: React.ChangeEvent<HTMLInputElement>,
+  ) => {
+    setDescription(event.target.value);
+  };
+
+  return (
+    <div>
+      <p>user: {user}</p>
+      <p>password: {password}</p>
+      <input
+        type="text"
+        value={description}
+        onChange={handleDescriptionChange}
+        placeholder="enter credential description"
+      />
+      <p>Credential Description: {description}</p>
+    </div>
+  );
+});
 
 export const HeaderButtons = () => {
   const requestSnap = useRequestSnap();

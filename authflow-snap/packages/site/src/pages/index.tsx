@@ -1,3 +1,4 @@
+import { useRef } from 'react';
 import styled from 'styled-components';
 
 import {
@@ -6,6 +7,8 @@ import {
   ReconnectButton,
   SendHelloButton,
   Card,
+  GetBasicCredsButton,
+  BasicCredsDisplay,
 } from '../components';
 import { defaultSnapOrigin } from '../config';
 import {
@@ -14,6 +17,7 @@ import {
   useMetaMaskContext,
   useRequestSnap,
 } from '../hooks';
+import type { BasicCredsDisplayHandle, UserCredentials } from '../types/snap';
 import { isLocalSnap, shouldDisplayReconnectButton } from '../utils';
 
 const Container = styled.div`
@@ -114,6 +118,22 @@ const Index = () => {
     await invokeSnap({ method: 'hello' });
   };
 
+  const basicCredsRef = useRef<BasicCredsDisplayHandle>(null);
+
+  const handleGetBasicCredsClick = async () => {
+    if (basicCredsRef.current) {
+      const basicCreds: UserCredentials = (await invokeSnap({
+        method: 'getBasicCreds',
+        params: {
+          credentialDescription: basicCredsRef.current.getDescription(),
+        },
+      })) as UserCredentials;
+
+      basicCredsRef.current.setUser(basicCreds.username);
+      basicCredsRef.current.setPassword(basicCreds.password);
+    }
+  };
+
   return (
     <Container>
       <Heading>
@@ -179,6 +199,26 @@ const Index = () => {
                 disabled={!installedSnap}
               />
             ),
+          }}
+          disabled={!installedSnap}
+          fullWidth={
+            isMetaMaskReady &&
+            Boolean(installedSnap) &&
+            !shouldDisplayReconnectButton(installedSnap)
+          }
+        />
+        <Card
+          content={{
+            title: 'Retrieve Username / Password',
+            description:
+              'Simulate a connected website retrieving the username / password.',
+            button: (
+              <GetBasicCredsButton
+                onClick={handleGetBasicCredsClick}
+                disabled={!installedSnap}
+              />
+            ),
+            data: <BasicCredsDisplay ref={basicCredsRef} />,
           }}
           disabled={!installedSnap}
           fullWidth={
