@@ -1,6 +1,8 @@
 import type { ManageStateResult, Panel } from '@metamask/snaps-sdk';
 import { panel, text, heading, copyable, divider } from '@metamask/snaps-sdk';
 
+import type { BasicCredential, SnapCredential } from '../snap-types/SnapTypes';
+
 export class SnapViewModels {
   public static helloViewModel(origin: string): Panel {
     return panel([
@@ -44,27 +46,26 @@ export class SnapViewModels {
     ]);
   }
 
-  public static async displayPasswordsViewModel(
-    passwords: ManageStateResult,
+  public static async displayCredentialsViewModel(
+    credentials: ManageStateResult,
   ): Promise<Panel> {
     const returnPanel: any = [heading('passwords')];
 
-    if (passwords === null) {
+    if (credentials === null) {
       return this.failureViewModel();
     }
 
     try {
-      Object.entries(passwords).forEach(([key, value]) => {
+      Object.entries(credentials).forEach(([key, value]) => {
         console.log(`Key: ${key}, Value:`, value);
 
         if (value !== null) {
-          const creds: string[] = value.toString().split(' ');
+          const cred = value as SnapCredential;
+          const credData = value as BasicCredential;
 
-          // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-          console.log(`user: ${creds[0]}, pw: ${creds[1]}`);
-          returnPanel.push(copyable(key));
-          returnPanel.push(copyable(creds[0]));
-          returnPanel.push(copyable(creds[1]));
+          returnPanel.push(copyable(cred.description));
+          returnPanel.push(copyable(credData.username));
+          returnPanel.push(copyable(credData.password));
           returnPanel.push(divider());
         }
       });

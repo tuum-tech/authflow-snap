@@ -15,9 +15,10 @@ import { divider } from '@metamask/snaps-ui';
 import { SnapState } from './snap-classes/SnapState';
 import { SnapInterfaces } from './snap-interfaces/snap-interfaces';
 import type {
-  BasicCredentials,
-  BasicCredsRequestParams,
-  UserCredentials,
+  BasicCredential,
+  VerifiedCredential,
+  CredsRequestParams,
+  SnapCredential,
 } from './snap-types/SnapTypes';
 import { SnapViewModels } from './snap-view-models/snap-vm';
 
@@ -36,8 +37,8 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
   request,
 }) => {
   let credentialDescription;
-  let returnedCreds: UserCredentials;
-  let credsRequestParams: BasicCredsRequestParams;
+  let returnedCreds: BasicCredential | VerifiedCredential;
+  let credsRequestParams: CredsRequestParams;
 
   switch (request.method) {
     case 'hello':
@@ -49,7 +50,7 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
         },
       });
     case 'getBasicCreds':
-      credsRequestParams = request.params as BasicCredsRequestParams;
+      credsRequestParams = request.params as CredsRequestParams;
       credentialDescription = credsRequestParams.credentialDescription;
       if (credentialDescription !== undefined) {
         await snap.request({
@@ -62,6 +63,8 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
             ),
           },
         });
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
         returnedCreds = await SnapState.getCredentialsForDescription(
           credentialDescription,
         );
@@ -102,10 +105,6 @@ export const onHomePage: OnHomePageHandler = async () => {
         name: 'btn-home-vc-show',
       }),
       button({
-        value: 'Create Verified Credential',
-        name: 'btn-home-vc-create',
-      }),
-      button({
         value: 'Delete All Verified Credentials',
         name: 'btn-home-vc-delete-all',
       }),
@@ -129,13 +128,16 @@ export const onUserInput: OnUserInputHandler = async ({ id, event }) => {
         desc = event.value['credential-description'];
 
         if (userName && pw && desc) {
-          const basicCredentials: BasicCredentials = {
-            username: userName,
-            password: pw,
+          const basicCredentials: SnapCredential = {
             description: desc,
+            type: 'Basic',
+            credentialData: {
+              username: userName,
+              password: pw,
+            },
           };
 
-          await SnapState.storePassword(basicCredentials);
+          await SnapState.storeCredential(basicCredentials);
         }
         break;
       case 'password-search-form':
@@ -144,7 +146,7 @@ export const onUserInput: OnUserInputHandler = async ({ id, event }) => {
         // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
         console.log(`search term is ${searchTerm}`);
 
-        try {
+        /* try {
           if (searchTerm) {
             result = await snap.request({
               method: 'snap_dialog',
@@ -161,7 +163,7 @@ export const onUserInput: OnUserInputHandler = async ({ id, event }) => {
         } catch (error: any) {
           // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
           console.log(`${error.message}`);
-        }
+        }*/
         break;
       default:
         console.log('no logic for this form');
@@ -192,7 +194,7 @@ export const onUserInput: OnUserInputHandler = async ({ id, event }) => {
         });
 
         if (result === true) {
-          await SnapState.clearPasswords();
+          await SnapState.clearCredentials();
         }
         return result;
         break;
@@ -201,8 +203,8 @@ export const onUserInput: OnUserInputHandler = async ({ id, event }) => {
           method: 'snap_dialog',
           params: {
             type: 'alert',
-            content: await SnapViewModels.displayPasswordsViewModel(
-              await SnapState.getPasswords(),
+            content: await SnapViewModels.displayCredentialsViewModel(
+              await SnapState.getCredentials(),
             ),
           },
         });

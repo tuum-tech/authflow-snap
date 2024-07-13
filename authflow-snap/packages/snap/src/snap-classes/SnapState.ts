@@ -1,33 +1,41 @@
-import type {
-  BasicCredentials,
-  UserCredentials,
-} from '../snap-types/SnapTypes';
+import { v4 as uuidv4 } from 'uuid';
+
+import type { BasicCredential, SnapCredential } from '../snap-types/SnapTypes';
 
 export class SnapState {
-  public static async getPasswords() {
-    const passwords = await snap.request({
+  public static async getCredentials() {
+    return await snap.request({
       method: 'snap_manageState',
       params: { operation: 'get' },
     });
-    return passwords;
   }
 
-  public static async storePassword(credentials: BasicCredentials) {
-    const passwords = await SnapState.getPasswords();
+  public static async storeCredential(credential: SnapCredential) {
+    const credentials = await SnapState.getCredentials();
 
-    await snap.request({
-      method: 'snap_manageState',
-      params: {
-        operation: 'update',
-        newState: {
-          ...passwords,
-          [credentials.description]: `${credentials.username} ${credentials.password}`,
+    const newUUID = uuidv4();
+
+    if (credential.type === 'Basic') {
+      const basicCredentialData = credential.credentialData as BasicCredential;
+      await snap.request({
+        method: 'snap_manageState',
+        params: {
+          operation: 'update',
+          newState: {
+            ...credentials,
+            [newUUID]: {
+              type: credential.type,
+              description: credential.description,
+              username: basicCredentialData.username,
+              password: basicCredentialData.password,
+            },
+          },
         },
-      },
-    });
+      });
+    }
   }
 
-  public static async clearPasswords() {
+  public static async clearCredentials() {
     await snap.request({
       method: 'snap_manageState',
       params: {
@@ -36,51 +44,24 @@ export class SnapState {
     });
   }
 
-  public static async searchPasswords(searchTerm: string) {
-    const passwords = await SnapState.getPasswords();
-
-    try {
-      if (passwords) {
-        Object.entries(passwords).forEach(([key]) => {
-          if (!key.includes(searchTerm)) {
-            delete passwords[key];
-          }
-        });
-      }
-
-      console.log('returning pw with no error');
-      return passwords;
-    } catch (error: any) {
-      console.error(error.message);
-      return passwords;
-    }
-  }
-
+  // eslint-disable-next-line consistent-return
   public static async getCredentialsForDescription(description: string) {
-    const passwords = await SnapState.getPasswords();
-    let basicCredentials: UserCredentials = {
-      username: 'error',
-      password: 'error',
-    };
+    const credentials = await SnapState.getCredentials();
 
-    if (passwords === null) {
-      return basicCredentials;
-    }
+    if (credentials !== null) {
+      // eslint-disable-next-line consistent-return
+      Object.entries(credentials).forEach(([key, value]) => {
+        console.log(`Key: ${key}, Value:`, value);
 
-    Object.entries(passwords).forEach(([key, value]) => {
-      console.log(`Key: ${key}, Value:`, value);
-
-      if (value !== null) {
-        if (key === description) {
-          const creds: string[] = value.toString().split(' ');
-
-          if (creds[0] !== undefined && creds[1] !== undefined) {
-            basicCredentials = { username: creds[0], password: creds[1] };
+        if (value !== null) {
+          const snapCredential = value as SnapCredential;
+          if (snapCredential.type === 'Basic') {
+            if (snapCredential.description === description) {
+              return snapCredential.credentialData as BasicCredential;
+            }
           }
         }
-      }
-    });
-
-    return basicCredentials;
+      });
+    }
   }
 }
