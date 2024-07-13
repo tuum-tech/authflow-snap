@@ -10,6 +10,7 @@ import {
   heading,
   UserInputEventType,
 } from '@metamask/snaps-sdk';
+import { divider } from '@metamask/snaps-ui';
 
 import { SnapState } from './snap-classes/SnapState';
 import { SnapInterfaces } from './snap-interfaces/snap-interfaces';
@@ -77,7 +78,7 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
 export const onHomePage: OnHomePageHandler = async () => {
   return {
     content: panel([
-      heading('AuthSnap'),
+      heading('AuthFlow'),
       text('Welcome to AuthFlow! Select an option below :'),
       button({
         value: 'Store New Passwords',
@@ -94,6 +95,19 @@ export const onHomePage: OnHomePageHandler = async () => {
       button({
         value: 'Search Passwords',
         name: 'btn-home-search',
+      }),
+      divider(),
+      button({
+        value: 'Get All Verified Credentials',
+        name: 'btn-home-vc-show',
+      }),
+      button({
+        value: 'Create Verified Credential',
+        name: 'btn-home-vc-create',
+      }),
+      button({
+        value: 'Delete All Verified Credentials',
+        name: 'btn-home-vc-delete-all',
       }),
     ]),
   };
