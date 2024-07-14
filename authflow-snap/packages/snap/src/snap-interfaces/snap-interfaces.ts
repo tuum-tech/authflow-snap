@@ -33,6 +33,34 @@ export class SnapInterfaces {
     return interfaceId;
   }
 
+  public static async createVCSaveInterface() {
+    const interfaceId = await snap.request({
+      method: 'snap_createInterface',
+      params: {
+        ui: form({
+          name: 'vc-save-form',
+          children: [
+            input({
+              name: 'credential-description',
+              placeholder: `description`,
+            }),
+            input({
+              name: 'vc-json',
+              placeholder: 'json',
+            }),
+            button({
+              name: 'btn-save-vc',
+              value: 'Save',
+              buttonType: 'submit',
+            }),
+          ],
+        }),
+      },
+    });
+
+    return interfaceId;
+  }
+
   public static async createPasswordSearchInterface() {
     const interfaceId = await snap.request({
       method: 'snap_createInterface',

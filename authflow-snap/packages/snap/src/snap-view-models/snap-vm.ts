@@ -1,7 +1,7 @@
 import type { ManageStateResult, Panel } from '@metamask/snaps-sdk';
 import { panel, text, heading, copyable, divider } from '@metamask/snaps-sdk';
 
-import type { BasicCredential, SnapCredential } from '../snap-types/SnapTypes';
+import type { BasicCredential, SnapCredential, VerifiedCredential } from '../snap-types/SnapTypes';
 
 export class SnapViewModels {
   public static helloViewModel(origin: string): Panel {
@@ -34,6 +34,13 @@ export class SnapViewModels {
     ]);
   }
 
+  public static clearAllVCViewModel(): Panel {
+    return panel([
+      heading('Clear all verified credentials?'),
+      text('Are you sure you want to clear all verified credentials?'),
+    ]);
+  }
+
   public static retrieveBasicCredsViewModel(
     description: string,
     site: string,
@@ -46,10 +53,10 @@ export class SnapViewModels {
     ]);
   }
 
-  public static async displayCredentialsViewModel(
+  public static async displayBasicCredentialsViewModel(
     credentials: ManageStateResult,
   ): Promise<Panel> {
-    const returnPanel: any = [heading('passwords')];
+    const returnPanel: any = [heading('Basic Credentials')];
 
     if (credentials === null) {
       return this.failureViewModel();
@@ -61,12 +68,45 @@ export class SnapViewModels {
 
         if (value !== null) {
           const cred = value as SnapCredential;
-          const credData = value as BasicCredential;
+          if(cred.type === 'Basic') {
+            const credData = value as BasicCredential;
 
-          returnPanel.push(copyable(cred.description));
-          returnPanel.push(copyable(credData.username));
-          returnPanel.push(copyable(credData.password));
-          returnPanel.push(divider());
+            returnPanel.push(copyable(cred.description));
+            returnPanel.push(copyable(credData.username));
+            returnPanel.push(copyable(credData.password));
+            returnPanel.push(divider());
+          }
+        }
+      });
+
+      return panel(returnPanel);
+    } catch (error: any) {
+      // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+      console.error(`error: ${error.message}`);
+      return panel(returnPanel);
+    }
+  }
+
+  public static async displayVerifiedCredentialsViewModel(
+    credentials: ManageStateResult,
+  ): Promise<Panel> {
+    const returnPanel: any = [heading('Verified Credentials')];
+
+    if (credentials === null) {
+      return this.failureViewModel();
+    }
+
+    try {
+      Object.entries(credentials).forEach(([key, value]) => {
+        console.log(`Key: ${key}, Value:`, value);
+
+        if (value !== null) {
+          const cred = value as SnapCredential;
+          if(cred.type === 'VerifiedCredential') {
+            returnPanel.push(copyable(cred.description));
+            returnPanel.push(copyable(cred.credentialData as VerifiedCredential));
+            returnPanel.push(divider());
+          }
         }
       });
 

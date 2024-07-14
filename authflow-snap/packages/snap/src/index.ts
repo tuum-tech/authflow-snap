@@ -108,6 +108,10 @@ export const onHomePage: OnHomePageHandler = async () => {
         value: 'Delete All Verified Credentials',
         name: 'btn-home-vc-delete-all',
       }),
+      button({
+        value: 'Save New Verified Credential',
+        name: 'btn-home-vc-save',
+      }),
     ]),
   };
 };
@@ -116,7 +120,7 @@ export const onUserInput: OnUserInputHandler = async ({ id, event }) => {
   let result;
 
   if (event.type === UserInputEventType.FormSubmitEvent) {
-    let userName, pw, desc, searchTerm;
+    let userName, pw, desc, searchTerm,verifiedCredentialJSON;
 
     switch (event.name) {
       case 'password-save-form':
@@ -138,6 +142,23 @@ export const onUserInput: OnUserInputHandler = async ({ id, event }) => {
           };
 
           await SnapState.storeCredential(basicCredentials);
+        }
+        break;
+      case 'vc-save-form':
+        // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+        console.log(`Returned event values are ${JSON.stringify(event.value)}`);
+
+        verifiedCredentialJSON = event.value['vc-json'];
+        desc = event.value['credential-description'];
+
+        if (verifiedCredentialJSON && desc) {
+          const verifiedCredential: SnapCredential = {
+            description: desc,
+            type: 'VerifiedCredential',
+            credentialData: verifiedCredentialJSON,
+          };
+
+          await SnapState.storeCredential(verifiedCredential);
         }
         break;
       case 'password-search-form':
@@ -198,12 +219,26 @@ export const onUserInput: OnUserInputHandler = async ({ id, event }) => {
         }
         return result;
         break;
+      case 'btn-home-vc-delete-all':
+        result = await snap.request({
+          method: 'snap_dialog',
+          params: {
+            type: 'confirmation',
+            content: SnapViewModels.clearAllVCViewModel(),
+          },
+        });
+
+        if (result === true) {
+          await SnapState.clearCredentials();
+        }
+        return result;
+        break;
       case 'btn-home-show':
         result = await snap.request({
           method: 'snap_dialog',
           params: {
             type: 'alert',
-            content: await SnapViewModels.displayCredentialsViewModel(
+            content: await SnapViewModels.displayBasicCredentialsViewModel(
               await SnapState.getCredentials(),
             ),
           },
@@ -221,6 +256,28 @@ export const onUserInput: OnUserInputHandler = async ({ id, event }) => {
         return result;
         break;
       case 'btn-select-cred':
+        break;
+      case 'btn-home-vc-show':
+        result = await snap.request({
+          method: 'snap_dialog',
+          params: {
+            type: 'alert',
+            content: await SnapViewModels.displayVerifiedCredentialsViewModel(
+              await SnapState.getCredentials(),
+            ),
+          },
+        });
+        return result;
+        break;
+      case 'btn-home-vc-save':
+        result = await snap.request({
+          method: 'snap_dialog',
+          params: {
+            type: 'alert',
+            id: await SnapInterfaces.createVCSaveInterface(),
+          },
+        });
+        return result;
         break;
       default:
         console.log('no logic for this button');

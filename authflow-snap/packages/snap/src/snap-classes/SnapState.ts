@@ -1,6 +1,9 @@
 import { v4 as uuidv4 } from 'uuid';
 
-import type { BasicCredential, SnapCredential } from '../snap-types/SnapTypes';
+import type {
+  BasicCredential,
+  SnapCredential,
+  VerifiedCredential } from '../snap-types/SnapTypes';
 
 export class SnapState {
   public static async getCredentials() {
@@ -33,6 +36,24 @@ export class SnapState {
         },
       });
     }
+    else if (credential.type === 'VerifiedCredential') {
+      const VerifiedCredentialJSON = credential.credentialData as VerifiedCredential;
+
+      await snap.request({
+        method: 'snap_manageState',
+        params: {
+          operation: 'update',
+          newState: {
+            ...credentials,
+            [newUUID]: {
+              type: credential.type,
+              description: credential.description,
+              credentialData: VerifiedCredentialJSON,
+            },
+          },
+        },
+      });
+    }
   }
 
   public static async clearCredentials() {
@@ -58,6 +79,10 @@ export class SnapState {
           if (snapCredential.type === 'Basic') {
             if (snapCredential.description === description) {
               return snapCredential.credentialData as BasicCredential;
+            }
+          } else if (snapCredential.type === 'VerifiedCredential') {
+            if (snapCredential.description === description) {
+              return snapCredential.credentialData as VerifiedCredential;
             }
           }
         }
