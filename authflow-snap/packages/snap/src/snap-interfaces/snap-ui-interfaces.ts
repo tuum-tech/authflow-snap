@@ -1,6 +1,6 @@
 import { input, button, form } from '@metamask/snaps-sdk';
 
-export class SnapInterfaces {
+export class SnapUiInterfaces {
   public static async createPasswordSaveInterface() {
     const interfaceId = await snap.request({
       method: 'snap_createInterface',
@@ -50,6 +50,34 @@ export class SnapInterfaces {
             }),
             button({
               name: 'btn-save-vc',
+              value: 'Save',
+              buttonType: 'submit',
+            }),
+          ],
+        }),
+      },
+    });
+
+    return interfaceId;
+  }
+
+  public static async createVPCreateInterface() {
+    const interfaceId = await snap.request({
+      method: 'snap_createInterface',
+      params: {
+        ui: form({
+          name: 'vp-create-form',
+          children: [
+            input({
+              name: 'credential-description',
+              placeholder: `description`,
+            }),
+            input({
+              name: 'vp-vc-list',
+              placeholder: 'vc1,vc2,vc3',
+            }),
+            button({
+              name: 'btn-create-vp',
               value: 'Save',
               buttonType: 'submit',
             }),

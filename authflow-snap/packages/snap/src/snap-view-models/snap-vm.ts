@@ -1,7 +1,12 @@
 import type { ManageStateResult, Panel } from '@metamask/snaps-sdk';
 import { panel, text, heading, copyable, divider } from '@metamask/snaps-sdk';
 
-import type { BasicCredential, SnapCredential, VerifiedCredential } from '../snap-types/SnapTypes';
+import { SnapVerified } from '../snap-classes/SnapVerified';
+import type {
+  BasicCredential,
+  IdentifyCredential,
+  SnapCredential,
+} from '../snap-types/SnapTypes';
 
 export class SnapViewModels {
   public static helloViewModel(origin: string): Panel {
@@ -53,6 +58,30 @@ export class SnapViewModels {
     ]);
   }
 
+  public static retrieveVerifiableCredsViewModel(
+    description: string,
+    site: string,
+  ): Panel {
+    return panel([
+      heading(`Send verifiable credential for ${description}`),
+      text(
+        `Are you sure you want to send the verifiable credential for ${description} to ${site}?`,
+      ),
+    ]);
+  }
+
+  public static displayVPConfirmationViewModel(
+    description: string,
+    site: string,
+  ): Panel {
+    return panel([
+      heading(`Create verifiable presentation from VC's: ${description}`),
+      text(
+        `Are you sure you want to create a verifiable presentation for verifiable credential${description} and send to ${site}?`,
+      ),
+    ]);
+  }
+
   public static async displayBasicCredentialsViewModel(
     credentials: ManageStateResult,
   ): Promise<Panel> {
@@ -68,7 +97,7 @@ export class SnapViewModels {
 
         if (value !== null) {
           const cred = value as SnapCredential;
-          if(cred.type === 'Basic') {
+          if (cred.type === 'Basic') {
             const credData = value as BasicCredential;
 
             returnPanel.push(copyable(cred.description));
@@ -102,43 +131,16 @@ export class SnapViewModels {
 
         if (value !== null) {
           const cred = value as SnapCredential;
-          if(cred.type === 'VerifiedCredential') {
+          if (cred.type === 'Identify') {
             returnPanel.push(copyable(cred.description));
-            returnPanel.push(copyable(cred.credentialData as VerifiedCredential));
+            returnPanel.push(
+              copyable((cred.credentialData as IdentifyCredential).id),
+            );
+            returnPanel.push(
+              copyable(SnapVerified.getDummyVerifiedCredential()),
+            );
             returnPanel.push(divider());
           }
-        }
-      });
-
-      return panel(returnPanel);
-    } catch (error: any) {
-      // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-      console.error(`error: ${error.message}`);
-      return panel(returnPanel);
-    }
-  }
-
-  public static async displayUsersViewModel(
-    passwords: ManageStateResult,
-  ): Promise<Panel> {
-    const returnPanel: any = [heading('passwords')];
-
-    if (passwords === null) {
-      return this.failureViewModel();
-    }
-
-    try {
-      Object.entries(passwords).forEach(([key, value]) => {
-        console.log(`Key: ${key}, Value:`, value);
-
-        if (value !== null) {
-          const creds: string[] = value.toString().split(' ');
-
-          // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-          console.log(`user: ${creds[0]}, pw: ${creds[1]}`);
-          returnPanel.push(copyable(` credential: ${key}`));
-          returnPanel.push(copyable(creds[0]));
-          returnPanel.push(divider());
         }
       });
 

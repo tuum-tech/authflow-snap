@@ -13,10 +13,10 @@ import {
 import { divider } from '@metamask/snaps-ui';
 
 import { SnapState } from './snap-classes/SnapState';
-import { SnapInterfaces } from './snap-interfaces/snap-interfaces';
+import { SnapVerified } from './snap-classes/SnapVerified';
+import { SnapUiInterfaces } from './snap-interfaces/snap-ui-interfaces';
 import type {
   BasicCredential,
-  VerifiedCredential,
   CredsRequestParams,
   SnapCredential,
 } from './snap-types/SnapTypes';
@@ -37,7 +37,7 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
   request,
 }) => {
   let credentialDescription;
-  let returnedCreds: BasicCredential | VerifiedCredential;
+  let returnedCreds: BasicCredential | string;
   let credsRequestParams: CredsRequestParams;
 
   switch (request.method) {
@@ -73,6 +73,53 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
 
       return null;
 
+    case 'getVerifiableCreds':
+      credsRequestParams = request.params as CredsRequestParams;
+      credentialDescription = credsRequestParams.credentialDescription;
+      if (credentialDescription !== undefined) {
+        await snap.request({
+          method: 'snap_dialog',
+          params: {
+            type: 'confirmation',
+            content: SnapViewModels.retrieveVerifiableCredsViewModel(
+              credentialDescription,
+              origin,
+            ),
+          },
+        });
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        returnedCreds = await SnapState.getCredentialsForDescription(
+          credentialDescription,
+        );
+        return returnedCreds;
+      }
+      return null;
+
+    case 'createVerifiablePresentation':
+      credsRequestParams = request.params as CredsRequestParams;
+      credentialDescription = credsRequestParams.credentialDescription;
+      if (credentialDescription !== undefined) {
+        await snap.request({
+          method: 'snap_dialog',
+          params: {
+            type: 'confirmation',
+            content: SnapViewModels.displayVPConfirmationViewModel(
+              credentialDescription,
+              origin,
+            ),
+          },
+        });
+
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        returnedCreds = await SnapState.getCredentialsForDescription(
+          credentialDescription,
+        );
+        return returnedCreds;
+      }
+      return null;
+
     default:
       throw new Error('Method not found.');
   }
@@ -95,10 +142,6 @@ export const onHomePage: OnHomePageHandler = async () => {
         value: 'Show All Passwords',
         name: 'btn-home-show',
       }),
-      button({
-        value: 'Search Passwords',
-        name: 'btn-home-search',
-      }),
       divider(),
       button({
         value: 'Get All Verified Credentials',
@@ -112,6 +155,11 @@ export const onHomePage: OnHomePageHandler = async () => {
         value: 'Save New Verified Credential',
         name: 'btn-home-vc-save',
       }),
+      divider(),
+      button({
+        value: 'Create Verified Presentation',
+        name: 'btn-home-vp-create',
+      }),
     ]),
   };
 };
@@ -119,8 +167,12 @@ export const onHomePage: OnHomePageHandler = async () => {
 export const onUserInput: OnUserInputHandler = async ({ id, event }) => {
   let result;
 
+  if (event.type === UserInputEventType.InputChangeEvent) {
+    return;
+  }
+
   if (event.type === UserInputEventType.FormSubmitEvent) {
-    let userName, pw, desc, searchTerm,verifiedCredentialJSON;
+    let userName, pw, desc;
 
     switch (event.name) {
       case 'password-save-form':
@@ -141,50 +193,23 @@ export const onUserInput: OnUserInputHandler = async ({ id, event }) => {
             },
           };
 
-          await SnapState.storeCredential(basicCredentials);
+          await SnapState.setCredential(basicCredentials);
         }
         break;
       case 'vc-save-form':
         // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
         console.log(`Returned event values are ${JSON.stringify(event.value)}`);
-
-        verifiedCredentialJSON = event.value['vc-json'];
-        desc = event.value['credential-description'];
-
-        if (verifiedCredentialJSON && desc) {
-          const verifiedCredential: SnapCredential = {
-            description: desc,
-            type: 'VerifiedCredential',
-            credentialData: verifiedCredentialJSON,
-          };
-
-          await SnapState.storeCredential(verifiedCredential);
-        }
-        break;
-      case 'password-search-form':
-        console.log('we are hitting form submit');
-        searchTerm = event.value['search-term'];
-        // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-        console.log(`search term is ${searchTerm}`);
-
-        /* try {
-          if (searchTerm) {
-            result = await snap.request({
-              method: 'snap_dialog',
-              params: {
-                type: 'alert',
-                content: await SnapViewModels.displayPasswordsViewModel(
-                  await SnapState.searchPasswords(searchTerm),
-                ),
-              },
-            });
-
-            return result;
-          }
+        try {
+          await SnapVerified.saveDummyVerifiedCredentials();
+          console.log(`successfully saved dummy verified credentials`);
         } catch (error: any) {
           // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-          console.log(`${error.message}`);
-        }*/
+          console.log(`error: ${error.message}`);
+        }
+        break;
+      case 'vp-create-form':
+        break;
+      case 'password-search-form':
         break;
       default:
         console.log('no logic for this form');
@@ -200,10 +225,9 @@ export const onUserInput: OnUserInputHandler = async ({ id, event }) => {
           method: 'snap_dialog',
           params: {
             type: 'alert',
-            id: await SnapInterfaces.createPasswordSaveInterface(),
+            id: await SnapUiInterfaces.createPasswordSaveInterface(),
           },
         });
-        return result;
         break;
       case 'btn-home-clear':
         result = await snap.request({
@@ -217,7 +241,6 @@ export const onUserInput: OnUserInputHandler = async ({ id, event }) => {
         if (result === true) {
           await SnapState.clearCredentials();
         }
-        return result;
         break;
       case 'btn-home-vc-delete-all':
         result = await snap.request({
@@ -231,7 +254,6 @@ export const onUserInput: OnUserInputHandler = async ({ id, event }) => {
         if (result === true) {
           await SnapState.clearCredentials();
         }
-        return result;
         break;
       case 'btn-home-show':
         result = await snap.request({
@@ -243,17 +265,15 @@ export const onUserInput: OnUserInputHandler = async ({ id, event }) => {
             ),
           },
         });
-        return result;
         break;
       case 'btn-home-search':
         result = await snap.request({
           method: 'snap_dialog',
           params: {
             type: 'alert',
-            id: await SnapInterfaces.createPasswordSearchInterface(),
+            id: await SnapUiInterfaces.createPasswordSearchInterface(),
           },
         });
-        return result;
         break;
       case 'btn-select-cred':
         break;
@@ -267,17 +287,30 @@ export const onUserInput: OnUserInputHandler = async ({ id, event }) => {
             ),
           },
         });
-        return result;
         break;
       case 'btn-home-vc-save':
         result = await snap.request({
           method: 'snap_dialog',
           params: {
             type: 'alert',
-            id: await SnapInterfaces.createVCSaveInterface(),
+            id: await SnapUiInterfaces.createVCSaveInterface(),
           },
         });
-        return result;
+        break;
+      case 'btn-home-vp-create':
+        result = await snap.request({
+          method: 'wallet_invokeSnap',
+          params: {
+            snapId: 'npm:@tuum-tech/identify',
+            request: {
+              method: 'hello',
+              params: {
+                metamaskAddress: '0x118fC316ff8651370dAdE2aEa34465C55873af30',
+              },
+            },
+          },
+        });
+        console.log(`identify data ${JSON.stringify(result)}`);
         break;
       default:
         console.log('no logic for this button');

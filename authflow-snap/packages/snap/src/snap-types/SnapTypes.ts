@@ -3,20 +3,17 @@ export type BasicCredential = {
   password: string;
 };
 
-export type VerifiedCredential = string;
-
 export type CredsRequestParams = {
-  credentialDescription?: string;
+  credentialDescription: string;
+};
+
+export type IdentifyCredential = {
+  id: string;
+  store: string;
 };
 
 export type SnapCredential = {
-  id?: string;
   description: string;
-  type: 'Basic' | 'VerifiedCredential' | 'None';
-  credentialData: BasicCredential | VerifiedCredential | undefined;
-};
-
-export type RpcRequest = {
-  method: string;
-  params: CredsRequestParams;
+  type: string;
+  credentialData: BasicCredential | IdentifyCredential;
 };

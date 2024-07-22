@@ -2,8 +2,10 @@ import { v4 as uuidv4 } from 'uuid';
 
 import type {
   BasicCredential,
+  IdentifyCredential,
   SnapCredential,
-  VerifiedCredential } from '../snap-types/SnapTypes';
+} from '../snap-types/SnapTypes';
+import { SnapVerified } from './SnapVerified';
 
 export class SnapState {
   public static async getCredentials() {
@@ -13,7 +15,7 @@ export class SnapState {
     });
   }
 
-  public static async storeCredential(credential: SnapCredential) {
+  public static async setCredential(credential: SnapCredential) {
     const credentials = await SnapState.getCredentials();
 
     const newUUID = uuidv4();
@@ -35,9 +37,9 @@ export class SnapState {
           },
         },
       });
-    }
-    else if (credential.type === 'VerifiedCredential') {
-      const VerifiedCredentialJSON = credential.credentialData as VerifiedCredential;
+    } else if (credential.type === 'Identify') {
+      const identifyCredentialData =
+        credential.credentialData as IdentifyCredential;
 
       await snap.request({
         method: 'snap_manageState',
@@ -48,7 +50,7 @@ export class SnapState {
             [newUUID]: {
               type: credential.type,
               description: credential.description,
-              credentialData: VerifiedCredentialJSON,
+              credentialData: identifyCredentialData,
             },
           },
         },
@@ -73,17 +75,14 @@ export class SnapState {
       // eslint-disable-next-line consistent-return
       Object.entries(credentials).forEach(([key, value]) => {
         console.log(`Key: ${key}, Value:`, value);
+        const snapCredential = value as SnapCredential;
 
-        if (value !== null) {
-          const snapCredential = value as SnapCredential;
+        if (value !== null && snapCredential.description === description) {
           if (snapCredential.type === 'Basic') {
-            if (snapCredential.description === description) {
-              return snapCredential.credentialData as BasicCredential;
-            }
-          } else if (snapCredential.type === 'VerifiedCredential') {
-            if (snapCredential.description === description) {
-              return snapCredential.credentialData as VerifiedCredential;
-            }
+            return snapCredential.credentialData;
+          } else if (snapCredential.type === 'Identify') {
+            // for now just return our dummy JSON
+            return SnapVerified.getDummyVerifiedCredential();
           }
         }
       });

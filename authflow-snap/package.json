@@ -56,5 +56,9 @@
       "@lavamoat/preinstall-always-fail": false,
       "sharp": true
     }
+  },
+  "dependencies": {
+    "@metamask/keyring-api": "^8.0.1",
+    "did-jwt-vc": "^4.0.4"
   }
 }
