@@ -237,13 +237,47 @@ export const onUserInput: OnUserInputHandler = async ({ id, event }) => {
 
     switch (event.name) {
       case 'btn-home-store':
-        result = await snap.request({
+        const desc = await snap.request({
           method: 'snap_dialog',
           params: {
-            type: 'alert',
-            id: await SnapUiInterfaces.createPasswordSaveInterface(),
+            type: 'prompt',
+            content:
+              await SnapViewModels.displayEnterBasicDescriptionViewModel(),
           },
         });
+
+        const user = await snap.request({
+          method: 'snap_dialog',
+          params: {
+            type: 'prompt',
+            content: await SnapViewModels.displayEnterBasicUserViewModel(),
+          },
+        });
+
+        const pw = await snap.request({
+          method: 'snap_dialog',
+          params: {
+            type: 'prompt',
+            content: await SnapViewModels.displayEnterBasicPasswordViewModel(),
+          },
+        });
+        if (desc && user && pw) {
+          const newBasicSnapCredential: SnapCredential = {
+            description: desc.toString(),
+            type: 'Basic',
+            credentialData: {
+              username: user.toString(),
+              password: pw.toString(),
+            },
+          };
+          await SnapState.setCredential(newBasicSnapCredential);
+          console.log(
+            `created basic credential: ${JSON.stringify(
+              newBasicSnapCredential,
+            )}`,
+          );
+        }
+        console.log(`data from enter basic: ${desc} ${user} ${pw}`);
         break;
       case 'btn-home-clear':
         result = await snap.request({

@@ -192,4 +192,28 @@ export class SnapViewModels {
 
     return panel(returnPanel);
   }
+
+  public static async displayEnterBasicDescriptionViewModel(): Promise<Panel> {
+    const returnPanel: any = [heading('Basic Credential')];
+
+    returnPanel.push(text('Enter basic credential description'));
+
+    return panel(returnPanel);
+  }
+
+  public static async displayEnterBasicUserViewModel(): Promise<Panel> {
+    const returnPanel: any = [heading('Basic Credential')];
+
+    returnPanel.push(text('Enter basic credential user'));
+
+    return panel(returnPanel);
+  }
+
+  public static async displayEnterBasicPasswordViewModel(): Promise<Panel> {
+    const returnPanel: any = [heading('Basic Credential')];
+
+    returnPanel.push(text('Enter basic credential password'));
+
+    return panel(returnPanel);
+  }
 }
