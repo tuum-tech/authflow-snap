@@ -1,7 +1,14 @@
 import type { ManageStateResult, Panel } from '@metamask/snaps-sdk';
-import { panel, text, heading, copyable, divider } from '@metamask/snaps-sdk';
+import {
+  panel,
+  text,
+  heading,
+  copyable,
+  divider,
+  input,
+} from '@metamask/snaps-sdk';
 
-import { SnapVerified } from '../snap-classes/SnapVerified';
+import { SnapVerifiable } from '../snap-classes/SnapVerifiable';
 import type {
   BasicCredential,
   IdentifyCredential,
@@ -98,7 +105,7 @@ export class SnapViewModels {
         if (value !== null) {
           const cred = value as SnapCredential;
           if (cred.type === 'Basic') {
-            const credData = value as BasicCredential;
+            const credData = cred.credentialData as BasicCredential;
 
             returnPanel.push(copyable(cred.description));
             returnPanel.push(copyable(credData.username));
@@ -116,28 +123,35 @@ export class SnapViewModels {
     }
   }
 
-  public static async displayVerifiedCredentialsViewModel(
+  public static async displayVerifiableCredentialsViewModel(
     credentials: ManageStateResult,
   ): Promise<Panel> {
-    const returnPanel: any = [heading('Verified Credentials')];
+    const returnPanel: any = [heading('Verifiable Credentials')];
 
     if (credentials === null) {
       return this.failureViewModel();
     }
 
+    const identifyCredentials = await SnapVerifiable.getVerifiableCredentials([
+      'snap',
+    ]);
+
+    const identifyCredValues: any[] = JSON.parse(identifyCredentials);
+    const identifyCredTable: Record<string, any> = {};
+    identifyCredValues.forEach((item) => {
+      identifyCredTable[item.metadata.id] = item.data;
+    });
+
     try {
       Object.entries(credentials).forEach(([key, value]) => {
-        console.log(`Key: ${key}, Value:`, value);
-
         if (value !== null) {
           const cred = value as SnapCredential;
           if (cred.type === 'Identify') {
+            const credId = (cred.credentialData as IdentifyCredential).id;
             returnPanel.push(copyable(cred.description));
+            returnPanel.push(copyable(credId));
             returnPanel.push(
-              copyable((cred.credentialData as IdentifyCredential).id),
-            );
-            returnPanel.push(
-              copyable(SnapVerified.getDummyVerifiedCredential()),
+              copyable(JSON.stringify(identifyCredTable[credId])),
             );
             returnPanel.push(divider());
           }
@@ -150,5 +164,32 @@ export class SnapViewModels {
       console.error(`error: ${error.message}`);
       return panel(returnPanel);
     }
+  }
+
+  public static async displayRenameVerifiableCredentialViewModel(): Promise<Panel> {
+    const returnPanel: any = [heading('Rename Verifiable Credential')];
+
+    returnPanel.push(text('Enter name'));
+
+    return panel(returnPanel);
+  }
+
+  public static async displayCreateVerifiablePresentationViewModel(): Promise<Panel> {
+    const returnPanel: any = [heading('Create Verifiable Presentation')];
+
+    returnPanel.push(text('Enter a comma separated list of credential names'));
+
+    return panel(returnPanel);
+  }
+
+  public static async displayShowVerifiablePresentationViewModel(
+    json: string,
+  ): Promise<Panel> {
+    const returnPanel: any = [heading(`Verifiable Presentation`)];
+
+    returnPanel.push(text('Generated Verifiable Presentation:'));
+    returnPanel.push(copyable(json));
+
+    return panel(returnPanel);
   }
 }

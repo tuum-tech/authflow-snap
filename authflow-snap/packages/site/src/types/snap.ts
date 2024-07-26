@@ -17,3 +17,8 @@ export type BasicCredsDisplayHandle = {
   setPassword: (password: string) => void;
   getDescription: () => string;
 };
+
+export type VerifiableCredsDisplayHandle = {
+  setVC: (vc: string) => void;
+  getDescription: () => string;
+};

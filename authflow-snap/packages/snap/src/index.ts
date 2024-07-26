@@ -13,7 +13,8 @@ import {
 import { divider } from '@metamask/snaps-ui';
 
 import { SnapState } from './snap-classes/SnapState';
-import { SnapVerified } from './snap-classes/SnapVerified';
+import { SnapVerifiable } from './snap-classes/SnapVerifiable';
+import { CredentialRenameDialog } from './snap-components/CredentialRename';
 import { SnapUiInterfaces } from './snap-interfaces/snap-ui-interfaces';
 import type {
   BasicCredential,
@@ -37,7 +38,7 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
   request,
 }) => {
   let credentialDescription;
-  let returnedCreds: BasicCredential | string;
+  let returnedCreds;
   let credsRequestParams: CredsRequestParams;
 
   switch (request.method) {
@@ -65,7 +66,7 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
         });
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
-        returnedCreds = await SnapState.getCredentialsForDescription(
+        returnedCreds = await SnapState.getBasicCredentialsForDescription(
           credentialDescription,
         );
         return returnedCreds;
@@ -89,9 +90,11 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
         });
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
-        returnedCreds = await SnapState.getCredentialsForDescription(
+        console.log(`verified cred description: ${credentialDescription}`);
+        returnedCreds = await SnapState.getIdentityCredentialForDescription(
           credentialDescription,
         );
+        console.log(`verified cred return ${returnedCreds}`);
         return returnedCreds;
       }
       return null;
@@ -113,7 +116,7 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
 
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
-        returnedCreds = await SnapState.getCredentialsForDescription(
+        returnedCreds = await SnapState.getBasicCredentialsForDescription(
           credentialDescription,
         );
         return returnedCreds;
@@ -152,20 +155,33 @@ export const onHomePage: OnHomePageHandler = async () => {
         name: 'btn-home-vc-delete-all',
       }),
       button({
-        value: 'Save New Verified Credential',
-        name: 'btn-home-vc-save',
+        value: 'Rename Verified Credential',
+        name: 'btn-home-vc-rename',
       }),
       divider(),
       button({
         value: 'Create Verified Presentation',
         name: 'btn-home-vp-create',
       }),
+      divider(),
+      button({
+        value: 'Create Sample Verified Credential',
+        name: 'btn-home-vc-sample-create',
+      }),
+      button({
+        value: 'Sync With Identify',
+        name: 'btn-home-sync',
+      }),
+      button({
+        value: 'Output Credentials To Console',
+        name: 'btn-home-debug',
+      }),
     ]),
   };
 };
 
 export const onUserInput: OnUserInputHandler = async ({ id, event }) => {
-  let result;
+  let result, tempJSON;
 
   if (event.type === UserInputEventType.InputChangeEvent) {
     return;
@@ -200,7 +216,7 @@ export const onUserInput: OnUserInputHandler = async ({ id, event }) => {
         // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
         console.log(`Returned event values are ${JSON.stringify(event.value)}`);
         try {
-          await SnapVerified.saveDummyVerifiedCredentials();
+          await SnapVerifiable.saveDummyVerifiedCredentials();
           console.log(`successfully saved dummy verified credentials`);
         } catch (error: any) {
           // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
@@ -282,7 +298,7 @@ export const onUserInput: OnUserInputHandler = async ({ id, event }) => {
           method: 'snap_dialog',
           params: {
             type: 'alert',
-            content: await SnapViewModels.displayVerifiedCredentialsViewModel(
+            content: await SnapViewModels.displayVerifiableCredentialsViewModel(
               await SnapState.getCredentials(),
             ),
           },
@@ -297,20 +313,76 @@ export const onUserInput: OnUserInputHandler = async ({ id, event }) => {
           },
         });
         break;
-      case 'btn-home-vp-create':
-        result = await snap.request({
-          method: 'wallet_invokeSnap',
+      case 'btn-home-vc-sample-create':
+        result = await SnapVerifiable.seedVerifiableCredentials();
+        break;
+      case 'btn-home-sync':
+        try {
+          result = await SnapState.syncCredentials();
+        } catch (error: any) {
+          // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+          console.error(`error : ${error.message}`);
+        }
+        break;
+      case 'btn-home-debug':
+        result = await SnapState.outputCredentialsToConsole();
+        break;
+      case 'btn-home-vc-rename':
+        const vcId = await snap.request({
+          method: 'snap_dialog',
           params: {
-            snapId: 'npm:@tuum-tech/identify',
-            request: {
-              method: 'hello',
-              params: {
-                metamaskAddress: '0x118fC316ff8651370dAdE2aEa34465C55873af30',
-              },
-            },
+            type: 'prompt',
+            content:
+              await SnapViewModels.displayRenameVerifiableCredentialViewModel(),
+            placeholder: 'id',
           },
         });
-        console.log(`identify data ${JSON.stringify(result)}`);
+        const newName = await snap.request({
+          method: 'snap_dialog',
+          params: {
+            type: 'prompt',
+            content:
+              await SnapViewModels.displayRenameVerifiableCredentialViewModel(),
+            placeholder: 'new name',
+          },
+        });
+
+        if (vcId && newName) {
+          await SnapState.renameIdentifyCredential(vcId, newName);
+        }
+        console.log(`rename cred result ${JSON.stringify(vcId)}`);
+        console.log(`rename cred result ${JSON.stringify(newName)}`);
+        break;
+      case 'btn-home-vp-create':
+        result = await snap.request({
+          method: 'snap_dialog',
+          params: {
+            type: 'prompt',
+            content:
+              await SnapViewModels.displayCreateVerifiablePresentationViewModel(),
+            placeholder: 'credential1,credential2',
+          },
+        });
+        console.log(
+          // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+          `return from verified presentation prompt: ${typeof result} ${result}`,
+        );
+        if (result) {
+          const returnVP = await SnapVerifiable.createVPFromVCs(result);
+          // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+          console.log(`return from create VP: ${JSON.stringify(returnVP)}`);
+
+          await snap.request({
+            method: 'snap_dialog',
+            params: {
+              type: 'alert',
+              content:
+                await SnapViewModels.displayShowVerifiablePresentationViewModel(
+                  JSON.stringify(returnVP),
+                ),
+            },
+          });
+        }
         break;
       default:
         console.log('no logic for this button');

@@ -8,7 +8,7 @@ import {
   SendHelloButton,
   Card,
   GetBasicCredsButton,
-  BasicCredsDisplay,
+  BasicCredsDisplay, VerifiableCredsDisplay, GetVerifiableCredsButton,
 } from '../components';
 import { defaultSnapOrigin } from '../config';
 import {
@@ -17,7 +17,7 @@ import {
   useMetaMaskContext,
   useRequestSnap,
 } from '../hooks';
-import type { BasicCredsDisplayHandle, UserCredentials } from '../types/snap';
+import type { BasicCredsDisplayHandle, VerifiableCredsDisplayHandle, UserCredentials, VerifiableCredentials } from '../types/snap';
 import { isLocalSnap, shouldDisplayReconnectButton } from '../utils';
 
 const Container = styled.div`
@@ -119,6 +119,7 @@ const Index = () => {
   };
 
   const basicCredsRef = useRef<BasicCredsDisplayHandle>(null);
+  const verifiableCredsRef = useRef<VerifiableCredsDisplayHandle>(null);
 
   const handleGetBasicCredsClick = async () => {
     if (basicCredsRef.current) {
@@ -131,6 +132,22 @@ const Index = () => {
 
       basicCredsRef.current.setUser(basicCreds.username);
       basicCredsRef.current.setPassword(basicCreds.password);
+    }
+  };
+
+  const handleGetVerifiableCredsClick = async () => {
+    if (verifiableCredsRef.current) {
+      const verifiableCreds = await invokeSnap({
+        method: 'getVerifiableCreds',
+        params: {
+          credentialDescription: verifiableCredsRef.current.getDescription(),
+        },
+      });
+      console.log(verifiableCreds);
+      console.log(JSON.stringify(verifiableCreds));
+      console.log(verifiableCredsRef);
+
+      verifiableCredsRef.current.setVC(JSON.stringify(verifiableCreds));
     }
   };
 
@@ -219,6 +236,26 @@ const Index = () => {
               />
             ),
             data: <BasicCredsDisplay ref={basicCredsRef} />,
+          }}
+          disabled={!installedSnap}
+          fullWidth={
+            isMetaMaskReady &&
+            Boolean(installedSnap) &&
+            !shouldDisplayReconnectButton(installedSnap)
+          }
+        />
+        <Card
+          content={{
+            title: 'Retrieve Verifiable Credential',
+            description:
+              'Simulate retrieving a verifiable credential or presentation based on a friendly name.',
+            button: (
+              <GetVerifiableCredsButton
+                onClick={handleGetVerifiableCredsClick}
+                disabled={!installedSnap}
+              />
+            ),
+            data: <VerifiableCredsDisplay ref={verifiableCredsRef} />,
           }}
           disabled={!installedSnap}
           fullWidth={

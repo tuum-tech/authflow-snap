@@ -104,6 +104,12 @@ export const GetBasicCredsButton = (props: ComponentProps<typeof Button>) => {
   return <Button {...props}>Get Basic Credentials</Button>;
 };
 
+export const GetVerifiableCredsButton = (
+  props: ComponentProps<typeof Button>,
+) => {
+  return <Button {...props}>Get Verifiable Credentials</Button>;
+};
+
 export const BasicCredsDisplay = forwardRef((props, ref) => {
   const [user, setUser] = useState<string>('Loading...');
   const [password, setPassword] = useState<string>('Loading...');
@@ -131,6 +137,36 @@ export const BasicCredsDisplay = forwardRef((props, ref) => {
         value={description}
         onChange={handleDescriptionChange}
         placeholder="enter credential description"
+      />
+      <p>Credential Description: {description}</p>
+    </div>
+  );
+});
+
+export const VerifiableCredsDisplay = forwardRef((props, ref) => {
+  const [vc, setVC] = useState<string>('');
+  const [description, setDescription] = useState<string>('');
+
+  useImperativeHandle(ref, () => ({
+    setVC: (newVC: string) => setVC(newVC),
+    getDescription: () => description,
+  }));
+
+  const handleDescriptionChange = (
+    // eslint-disable-next-line @typescript-eslint/no-shadow
+    event: React.ChangeEvent<HTMLInputElement>,
+  ) => {
+    setDescription(event.target.value);
+  };
+
+  return (
+    <div>
+      <p>VC: {vc}</p>
+      <input
+        type="text"
+        value={description}
+        onChange={handleDescriptionChange}
+        placeholder="Enter credential friendly name"
       />
       <p>Credential Description: {description}</p>
     </div>
