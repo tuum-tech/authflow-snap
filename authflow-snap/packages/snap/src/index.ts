@@ -14,10 +14,8 @@ import { divider } from '@metamask/snaps-ui';
 
 import { SnapState } from './snap-classes/SnapState';
 import { SnapVerifiable } from './snap-classes/SnapVerifiable';
-import { CredentialRenameDialog } from './snap-components/CredentialRename';
 import { SnapUiInterfaces } from './snap-interfaces/snap-ui-interfaces';
 import type {
-  BasicCredential,
   CredsRequestParams,
   SnapCredential,
 } from './snap-types/SnapTypes';
@@ -37,9 +35,10 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
   origin,
   request,
 }) => {
-  let credentialDescription;
-  let returnedCreds;
-  let credsRequestParams: CredsRequestParams;
+  let credentialDescription,
+    returnedCreds,
+    result,
+    credsRequestParams: CredsRequestParams;
 
   switch (request.method) {
     case 'hello':
@@ -102,24 +101,28 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
     case 'createVerifiablePresentation':
       credsRequestParams = request.params as CredsRequestParams;
       credentialDescription = credsRequestParams.credentialDescription;
+      console.log(
+        `verifiable presentation credential description: ${credentialDescription}`,
+      );
       if (credentialDescription !== undefined) {
         await snap.request({
           method: 'snap_dialog',
           params: {
             type: 'confirmation',
-            content: SnapViewModels.displayVPConfirmationViewModel(
+            content: SnapViewModels.createVerifiablePresentationViewModel(
               credentialDescription,
               origin,
             ),
           },
         });
 
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore
-        returnedCreds = await SnapState.getBasicCredentialsForDescription(
+        const returnVP = await SnapVerifiable.createVPFromVCs(
           credentialDescription,
         );
-        return returnedCreds;
+        // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+        console.log(`return from create VP: ${JSON.stringify(returnVP)}`);
+
+        return returnVP;
       }
       return null;
 

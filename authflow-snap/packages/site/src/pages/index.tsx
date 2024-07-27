@@ -8,7 +8,11 @@ import {
   SendHelloButton,
   Card,
   GetBasicCredsButton,
-  BasicCredsDisplay, VerifiableCredsDisplay, GetVerifiableCredsButton,
+  BasicCredsDisplay,
+  VerifiableCredsDisplay,
+  GetVerifiableCredsButton,
+  CreateVerifiablePresentationButton,
+  VerifiablePresentationDisplay,
 } from '../components';
 import { defaultSnapOrigin } from '../config';
 import {
@@ -17,7 +21,13 @@ import {
   useMetaMaskContext,
   useRequestSnap,
 } from '../hooks';
-import type { BasicCredsDisplayHandle, VerifiableCredsDisplayHandle, UserCredentials, VerifiableCredentials } from '../types/snap';
+import type {
+  BasicCredsDisplayHandle,
+  VerifiableCredsDisplayHandle,
+  UserCredentials,
+  VerifiableCredentials,
+  VerifiablePresentationDisplayHandle
+} from '../types/snap';
 import { isLocalSnap, shouldDisplayReconnectButton } from '../utils';
 
 const Container = styled.div`
@@ -120,6 +130,7 @@ const Index = () => {
 
   const basicCredsRef = useRef<BasicCredsDisplayHandle>(null);
   const verifiableCredsRef = useRef<VerifiableCredsDisplayHandle>(null);
+  const verifiablePresentationRef = useRef<VerifiablePresentationDisplayHandle>(null);
 
   const handleGetBasicCredsClick = async () => {
     if (basicCredsRef.current) {
@@ -148,6 +159,22 @@ const Index = () => {
       console.log(verifiableCredsRef);
 
       verifiableCredsRef.current.setVC(JSON.stringify(verifiableCreds));
+    }
+  };
+
+  const handleCreateVerifiablePresentationClick = async () => {
+    if (verifiablePresentationRef.current) {
+      const verifiablePresentation = await invokeSnap({
+        method: 'createVerifiablePresentation',
+        params: {
+          credentialDescription: verifiablePresentationRef.current.getDescription(),
+        },
+      });
+      console.log(verifiablePresentation);
+      console.log(JSON.stringify(verifiablePresentation));
+      console.log(verifiablePresentationRef);
+
+      verifiablePresentationRef.current.setVP(JSON.stringify(verifiablePresentation));
     }
   };
 
@@ -256,6 +283,29 @@ const Index = () => {
               />
             ),
             data: <VerifiableCredsDisplay ref={verifiableCredsRef} />,
+          }}
+          disabled={!installedSnap}
+          fullWidth={
+            isMetaMaskReady &&
+            Boolean(installedSnap) &&
+            !shouldDisplayReconnectButton(installedSnap)
+          }
+        />
+
+        <Card
+          content={{
+            title: 'Generate Verifiable Presentation',
+            description:
+              'Generate a verifiable presentation based on a comma separated list of friendly names.',
+            button: (
+              <CreateVerifiablePresentationButton
+                onClick={handleCreateVerifiablePresentationClick}
+                disabled={!installedSnap}
+              />
+            ),
+            data: (
+              <VerifiablePresentationDisplay ref={verifiablePresentationRef} />
+            ),
           }}
           disabled={!installedSnap}
           fullWidth={

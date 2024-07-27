@@ -110,6 +110,12 @@ export const GetVerifiableCredsButton = (
   return <Button {...props}>Get Verifiable Credentials</Button>;
 };
 
+export const CreateVerifiablePresentationButton = (
+  props: ComponentProps<typeof Button>,
+) => {
+  return <Button {...props}>Generate Verified Presentation</Button>;
+};
+
 export const BasicCredsDisplay = forwardRef((props, ref) => {
   const [user, setUser] = useState<string>('Loading...');
   const [password, setPassword] = useState<string>('Loading...');
@@ -162,6 +168,36 @@ export const VerifiableCredsDisplay = forwardRef((props, ref) => {
   return (
     <div>
       <p>VC: {vc}</p>
+      <input
+        type="text"
+        value={description}
+        onChange={handleDescriptionChange}
+        placeholder="Enter credential friendly name"
+      />
+      <p>Credential Description: {description}</p>
+    </div>
+  );
+});
+
+export const VerifiablePresentationDisplay = forwardRef((props, ref) => {
+  const [vp, setVP] = useState<string>('');
+  const [description, setDescription] = useState<string>('');
+
+  useImperativeHandle(ref, () => ({
+    setVP: (newVP: string) => setVP(newVP),
+    getDescription: () => description,
+  }));
+
+  const handleDescriptionChange = (
+    // eslint-disable-next-line @typescript-eslint/no-shadow
+    event: React.ChangeEvent<HTMLInputElement>,
+  ) => {
+    setDescription(event.target.value);
+  };
+
+  return (
+    <div>
+      <p>VP: {vp}</p>
       <input
         type="text"
         value={description}

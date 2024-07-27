@@ -22,3 +22,8 @@ export type VerifiableCredsDisplayHandle = {
   setVC: (vc: string) => void;
   getDescription: () => string;
 };
+
+export type VerifiablePresentationDisplayHandle = {
+  setVP: (vp: string) => void;
+  getDescription: () => string;
+};

@@ -77,6 +77,20 @@ export class SnapViewModels {
     ]);
   }
 
+  public static createVerifiablePresentationViewModel(
+    description: string,
+    site: string,
+  ): Panel {
+    return panel([
+      heading(
+        `Create verifiable presentation for verifiable credential(s) ${description}`,
+      ),
+      text(
+        `Are you sure you want to create a verifiable presentation for ${description} to ${site}?`,
+      ),
+    ]);
+  }
+
   public static displayVPConfirmationViewModel(
     description: string,
     site: string,
