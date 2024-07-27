@@ -37,7 +37,6 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
 }) => {
   let credentialDescription,
     returnedCreds,
-    result,
     credsRequestParams: CredsRequestParams;
 
   switch (request.method) {

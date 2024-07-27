@@ -147,7 +147,7 @@ export class SnapViewModels {
     }
 
     const identifyCredentials = await SnapVerifiable.getVerifiableCredentials([
-      'snap',
+      'snap','googleDrive'
     ]);
 
     const identifyCredValues: any[] = JSON.parse(identifyCredentials);
@@ -184,6 +184,14 @@ export class SnapViewModels {
     const returnPanel: any = [heading('Rename Verifiable Credential')];
 
     returnPanel.push(text('Enter name'));
+
+    return panel(returnPanel);
+  }
+
+  public static async displayConfigureGoogleViewModel(): Promise<Panel> {
+    const returnPanel: any = [heading('Configure Google Drive')];
+
+    returnPanel.push(text('Enter Google access token'));
 
     return panel(returnPanel);
   }

@@ -5,6 +5,7 @@ import type {
   IdentifyCredential,
   SnapCredential,
 } from '../snap-types/SnapTypes';
+import { SnapCrypto } from './SnapCrypto';
 import { SnapVerifiable } from './SnapVerifiable';
 
 export class SnapState {
@@ -33,7 +34,7 @@ export class SnapState {
       },
     });
 
-    await SnapVerifiable.clearAllIdentifyCredentials(['snap']);
+    await SnapVerifiable.clearAllIdentifyCredentials(['snap', 'googleDrive']);
   }
 
   public static async setCredential(credential: SnapCredential) {
@@ -124,7 +125,10 @@ export class SnapState {
     }
 
     if (vcKey) {
-      const vcJSON = await SnapVerifiable.getVCForKey(['snap'], vcKey);
+      const vcJSON = await SnapVerifiable.getVCForKey(
+        ['snap', 'googleDrive'],
+        vcKey,
+      );
       return vcJSON;
     }
 
@@ -133,12 +137,14 @@ export class SnapState {
 
   public static async syncCredentials() {
     const identifyCredentialsString =
-      await SnapVerifiable.getVerifiableCredentials(['snap']);
+      await SnapVerifiable.getVerifiableCredentials(['snap', 'googleDrive']);
     const identifyCredentials: any[] = JSON.parse(identifyCredentialsString);
     const identifyIds = this.getIdsFromIdentifyData(identifyCredentials);
     const authflowCredentials = await SnapState.getCredentials();
 
     const identifyIdSet = new Set(identifyIds);
+
+    const googleResult = await this.syncGoogleCredentials();
 
     if (identifyCredentials && identifyIds && authflowCredentials) {
       for (const identifyId of identifyIds) {
@@ -265,5 +271,57 @@ export class SnapState {
     }
 
     return vcIds;
+  }
+
+  public static async configureGoogleAccount(accessToken: any) {
+    const metamaskAddress = await SnapCrypto.getCurrentMetamaskAccount(
+      ethereum,
+    );
+    const params = {
+      metamaskAddress,
+      accessToken,
+    };
+
+    const result = await snap.request({
+      method: 'wallet_invokeSnap',
+      params: {
+        snapId: 'npm:@tuum-tech/identify',
+        request: {
+          method: 'configureGoogleAccount',
+          params,
+        },
+      },
+    });
+
+    return result;
+  }
+
+  public static async syncGoogleCredentials() {
+    const metamaskAddress = await SnapCrypto.getCurrentMetamaskAccount(
+      ethereum,
+    );
+    const params = {
+      metamaskAddress,
+    };
+
+    let result = null;
+
+    try {
+      result = await snap.request({
+        method: 'wallet_invokeSnap',
+        params: {
+          snapId: 'npm:@tuum-tech/identify',
+          request: {
+            method: 'syncGoogleVCs',
+            params,
+          },
+        },
+      });
+
+      return result;
+    } catch (error) {
+      console.error(`Error in syncGoogleCredentials: ${error.message}`);
+      return result;
+    }
   }
 }

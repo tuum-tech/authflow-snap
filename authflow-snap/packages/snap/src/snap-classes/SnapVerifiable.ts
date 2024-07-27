@@ -40,7 +40,7 @@ export class SnapVerifiable {
   public static async createVPFromVCs(vcNamesCSV: any) {
     const vcNames = vcNamesCSV.split(',');
     const vcIds = await SnapState.getIdentifyIdsForNames(vcNames);
-    const stores = ['snap'];
+    const stores = ['snap', 'googleDrive'];
     const metamaskAddress = await SnapCrypto.getCurrentMetamaskAccount(
       ethereum,
     );
@@ -105,7 +105,7 @@ export class SnapVerifiable {
     );
 
     const options = {
-      store: ['snap'],
+      store: ['snap', 'googleDrive'],
     };
 
     const vcKey = 'Sample Authflow Credential';
