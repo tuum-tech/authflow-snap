@@ -26,15 +26,58 @@ export class SnapState {
     });
   }
 
-  public static async clearCredentials() {
-    await snap.request({
-      method: 'snap_manageState',
-      params: {
-        operation: 'clear',
-      },
-    });
+  public static async clearBasicCredentials() {
+    const credentials = await SnapState.getCredentials();
 
-    await SnapVerifiable.clearAllIdentifyCredentials(['snap', 'googleDrive']);
+    if (credentials) {
+      Object.entries(credentials).forEach(([key, item]) => {
+        const snapCredential = item as SnapCredential;
+        if (snapCredential.type === 'Basic') {
+          delete credentials[key];
+        }
+      });
+
+      await snap.request({
+        method: 'snap_manageState',
+        params: {
+          operation: 'update',
+          newState: {
+            ...credentials,
+          },
+        },
+      });
+    }
+  }
+
+  public static async clearVerifiableCredentials() {
+    const credentials = await SnapState.getCredentials();
+
+    if (credentials) {
+      Object.entries(credentials).forEach(([key, item]) => {
+        const snapCredential = item as SnapCredential;
+        if (snapCredential.type === 'Identify') {
+          delete credentials[key];
+        }
+      });
+
+      await snap.request({
+        method: 'snap_manageState',
+        params: {
+          operation: 'update',
+          newState: {
+            ...credentials,
+          },
+        },
+      });
+    }
+
+    try {
+      await SnapVerifiable.clearAllIdentifyCredentials(['snap', 'googleDrive']);
+    }
+
+    catch(Error) {
+      await SnapVerifiable.clearAllIdentifyCredentials(['snap']);
+    }
   }
 
   public static async setCredential(credential: SnapCredential) {

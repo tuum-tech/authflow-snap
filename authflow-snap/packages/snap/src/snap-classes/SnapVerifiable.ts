@@ -37,10 +37,9 @@ export class SnapVerifiable {
     );
   }
 
-  public static async createVPFromVCs(vcNamesCSV: any) {
+  public static async createVPFromVCs(vcNamesCSV: any, stores: string[]) {
     const vcNames = vcNamesCSV.split(',');
     const vcIds = await SnapState.getIdentifyIdsForNames(vcNames);
-    const stores = ['snap', 'googleDrive'];
     const metamaskAddress = await SnapCrypto.getCurrentMetamaskAccount(
       ethereum,
     );
@@ -99,13 +98,13 @@ export class SnapVerifiable {
     });
   }
 
-  public static async seedVerifiableCredentials() {
+  public static async seedVerifiableCredentials(stores: string[]) {
     const metamaskAddress = await SnapCrypto.getCurrentMetamaskAccount(
       ethereum,
     );
 
     const options = {
-      store: ['snap', 'googleDrive'],
+      store: stores,
     };
 
     const vcKey = 'Sample Authflow Credential';

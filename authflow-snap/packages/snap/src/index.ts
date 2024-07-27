@@ -114,10 +114,21 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
             ),
           },
         });
+        let returnVP;
 
-        const returnVP = await SnapVerifiable.createVPFromVCs(
-          credentialDescription,
-        );
+        try {
+          returnVP = await SnapVerifiable.createVPFromVCs(
+            credentialDescription,
+            ['snap','googleDrive']
+          );
+        }
+
+        catch(Error){
+          returnVP = await SnapVerifiable.createVPFromVCs(
+            credentialDescription,
+            ['snap']
+          );
+        }
         // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
         console.log(`return from create VP: ${JSON.stringify(returnVP)}`);
 
@@ -291,7 +302,7 @@ export const onUserInput: OnUserInputHandler = async ({ id, event }) => {
         });
 
         if (result === true) {
-          await SnapState.clearCredentials();
+          await SnapState.clearBasicCredentials();
         }
         break;
       case 'btn-home-vc-delete-all':
@@ -304,7 +315,7 @@ export const onUserInput: OnUserInputHandler = async ({ id, event }) => {
         });
 
         if (result === true) {
-          await SnapState.clearCredentials();
+          await SnapState.clearVerifiableCredentials();
         }
         break;
       case 'btn-home-show':
@@ -350,7 +361,12 @@ export const onUserInput: OnUserInputHandler = async ({ id, event }) => {
         });
         break;
       case 'btn-home-vc-sample-create':
-        result = await SnapVerifiable.seedVerifiableCredentials();
+        try {
+          result = await SnapVerifiable.seedVerifiableCredentials(['snap', 'googleDrive']);
+        }
+        catch(Error) {
+          result = await SnapVerifiable.seedVerifiableCredentials(['snap']);
+        }
         break;
       case 'btn-home-sync':
         try {
@@ -404,7 +420,13 @@ export const onUserInput: OnUserInputHandler = async ({ id, event }) => {
           `return from verified presentation prompt: ${typeof result} ${result}`,
         );
         if (result) {
-          const returnVP = await SnapVerifiable.createVPFromVCs(result);
+          let returnVP;
+          try {
+            returnVP = await SnapVerifiable.createVPFromVCs(result, ['snap', 'googleDrive']);
+          }
+          catch(Error) {
+            returnVP = await SnapVerifiable.createVPFromVCs(result, ['snap']);
+          }
           // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
           console.log(`return from create VP: ${JSON.stringify(returnVP)}`);
 

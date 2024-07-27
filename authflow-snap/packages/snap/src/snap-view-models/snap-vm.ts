@@ -146,9 +146,18 @@ export class SnapViewModels {
       return this.failureViewModel();
     }
 
-    const identifyCredentials = await SnapVerifiable.getVerifiableCredentials([
-      'snap','googleDrive'
-    ]);
+    let identifyCredentials;
+    try {
+      identifyCredentials = await SnapVerifiable.getVerifiableCredentials([
+        'snap', 'googleDrive'
+      ]);
+    }
+
+    catch(Error) {
+      identifyCredentials = await SnapVerifiable.getVerifiableCredentials([
+        'snap'
+      ]);
+    }
 
     const identifyCredValues: any[] = JSON.parse(identifyCredentials);
     const identifyCredTable: Record<string, any> = {};
