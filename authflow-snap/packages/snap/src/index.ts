@@ -96,7 +96,7 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
           returnedCreds = await SnapState.getIdentityCredentialForDescription(
             credentialDescription,
           );
-          console.log(`verified cred return ${returnedCreds}`);
+          console.log(`verified cred return ${JSON.stringify(returnedCreds)}`);
           return returnedCreds;
         }
       }
@@ -126,12 +126,12 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
           try {
             returnVP = await SnapVerifiable.createVPFromVCs(
               credentialDescription,
-              ['snap', 'googleDrive']
+              ['snap', 'googleDrive'],
             );
-          } catch (Error) {
+          } catch (error) {
             returnVP = await SnapVerifiable.createVPFromVCs(
               credentialDescription,
-              ['snap']
+              ['snap'],
             );
           }
           // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
@@ -207,7 +207,6 @@ export const onUserInput: OnUserInputHandler = async ({ id, event }) => {
   }
 
   if (event.type === UserInputEventType.FormSubmitEvent) {
-
     switch (event.name) {
       default:
         console.log('no logic for this form');
@@ -218,7 +217,7 @@ export const onUserInput: OnUserInputHandler = async ({ id, event }) => {
     console.log(`The interface being acted on is ${id}`);
 
     switch (event.name) {
-      case 'btn-home-store':
+      case 'btn-home-store': {
         const desc = await snap.request({
           method: 'snap_dialog',
           params: {
@@ -259,8 +258,13 @@ export const onUserInput: OnUserInputHandler = async ({ id, event }) => {
             )}`,
           );
         }
-        console.log(`data from enter basic: ${desc} ${user} ${pw}`);
+        console.log(
+          `data from enter basic: ${JSON.stringify(desc)} ${JSON.stringify(
+            user,
+          )} ${JSON.stringify(pw)}`,
+        );
         break;
+      }
       case 'btn-home-clear':
         result = await snap.request({
           method: 'snap_dialog',
@@ -331,9 +335,11 @@ export const onUserInput: OnUserInputHandler = async ({ id, event }) => {
         break;
       case 'btn-home-vc-sample-create':
         try {
-          result = await SnapVerifiable.seedVerifiableCredentials(['snap', 'googleDrive']);
-        }
-        catch(Error) {
+          result = await SnapVerifiable.seedVerifiableCredentials([
+            'snap',
+            'googleDrive',
+          ]);
+        } catch (error) {
           result = await SnapVerifiable.seedVerifiableCredentials(['snap']);
         }
         break;
@@ -348,7 +354,7 @@ export const onUserInput: OnUserInputHandler = async ({ id, event }) => {
       case 'btn-home-debug':
         result = await SnapState.outputCredentialsToConsole();
         break;
-      case 'btn-home-vc-rename':
+      case 'btn-home-vc-rename': {
         const vcId = await snap.request({
           method: 'snap_dialog',
           params: {
@@ -368,12 +374,18 @@ export const onUserInput: OnUserInputHandler = async ({ id, event }) => {
           },
         });
 
-        if (vcId && newName) {
+        if (
+          vcId &&
+          typeof vcId === 'string' &&
+          newName &&
+          typeof newName === 'string'
+        ) {
           await SnapState.renameIdentifyCredential(vcId, newName);
         }
         console.log(`rename cred result ${JSON.stringify(vcId)}`);
         console.log(`rename cred result ${JSON.stringify(newName)}`);
         break;
+      }
       case 'btn-home-vp-create':
         result = await snap.request({
           method: 'snap_dialog',
@@ -391,9 +403,11 @@ export const onUserInput: OnUserInputHandler = async ({ id, event }) => {
         if (result) {
           let returnVP;
           try {
-            returnVP = await SnapVerifiable.createVPFromVCs(result, ['snap', 'googleDrive']);
-          }
-          catch(Error) {
+            returnVP = await SnapVerifiable.createVPFromVCs(result, [
+              'snap',
+              'googleDrive',
+            ]);
+          } catch (error) {
             returnVP = await SnapVerifiable.createVPFromVCs(result, ['snap']);
           }
 
