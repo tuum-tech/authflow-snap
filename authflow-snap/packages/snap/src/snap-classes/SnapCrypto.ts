@@ -12,17 +12,18 @@ export class SnapCrypto {
     metamask: SnapsEthereumProvider,
   ): Promise<string> {
     try {
-      const accounts = await metamask.request({
+      const accounts = (await metamask.request({
         method: 'eth_requestAccounts',
-      }) as string[];
+      })) as string[];
 
       if (accounts[0] && accounts.length > 0) {
         return accounts[0];
-      } else {
-        throw new Error("No MetaMask accounts found.");
       }
+
+      return '';
     } catch (error: unknown) {
-      let errorMessage = "An unknown error occurred while fetching MetaMask account.";
+      let errorMessage =
+        'An unknown error occurred while fetching MetaMask account.';
       if (error instanceof Error) {
         errorMessage = error.message;
       }
