@@ -30,7 +30,7 @@
     "@hashgraph/sdk": "^2.48.1",
     "@metamask/keyring-api": "^8.0.1",
     "@metamask/providers": "^17.1.1",
-    "@metamask/snaps-sdk": "^6.1.1",
+    "@metamask/snaps-sdk": "^4.0.0",
     "@metamask/snaps-types": "^3.1.0",
     "@metamask/snaps-ui": "^3.1.0",
     "@veramo/core": "^6.0.0",

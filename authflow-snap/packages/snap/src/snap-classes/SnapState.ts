@@ -138,7 +138,9 @@ export class SnapState {
     }
   }
 
-  public static async getBasicCredentialsForDescription(description: string) {
+  public static async getBasicCredentialsForDescription(
+    description: string,
+  ): Promise<BasicCredential> {
     try {
       const credentials = await this.getCredentials();
       let returnCredentials;
@@ -156,15 +158,31 @@ export class SnapState {
                 password: credData.password,
               };
               break;
+            } else {
+              throw new Error('Not a basic credential.');
             }
+          } else {
+            throw new Error('Credential not found.');
           }
         }
+      } else {
+        throw new Error('Credentials undefined.');
       }
 
-      return returnCredentials;
+      if (returnCredentials) {
+        return returnCredentials;
+      }
+
+      return {
+        username: '',
+        password: '',
+      };
     } catch (error) {
       console.error('Error getting basic credentials for description:', error);
-      return '';
+      return {
+        username: '',
+        password: '',
+      };
     }
   }
 

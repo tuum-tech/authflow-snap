@@ -52,7 +52,7 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
     case 'getBasicCreds':
       credsRequestParams = request.params as CredsRequestParams;
       credentialDescription = credsRequestParams.credentialDescription;
-      if (credentialDescription !== undefined) {
+      if (credentialDescription) {
         result = await snap.request({
           method: 'snap_dialog',
           params: {
@@ -63,14 +63,14 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
             ),
           },
         });
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore
         if (result === true) {
           returnedCreds = await SnapState.getBasicCredentialsForDescription(
             credentialDescription,
           );
           return returnedCreds;
         }
+      } else {
+        throw new Error('Credentials undefined.');
       }
 
       return null;
@@ -90,8 +90,6 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
           },
         });
         if (result === true) {
-          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-          // @ts-ignore
           console.log(`verified cred description: ${credentialDescription}`);
           returnedCreds = await SnapState.getIdentityCredentialForDescription(
             credentialDescription,
@@ -134,7 +132,6 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
               ['snap'],
             );
           }
-          // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
           console.log(`return from create VP: ${JSON.stringify(returnVP)}`);
 
           return returnVP;
