@@ -37,7 +37,8 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
 }) => {
   let credentialDescription,
     returnedCreds,
-    credsRequestParams: CredsRequestParams;
+    credsRequestParams: CredsRequestParams,
+    result;
 
   switch (request.method) {
     case 'hello':
@@ -52,7 +53,7 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
       credsRequestParams = request.params as CredsRequestParams;
       credentialDescription = credsRequestParams.credentialDescription;
       if (credentialDescription !== undefined) {
-        await snap.request({
+        result = await snap.request({
           method: 'snap_dialog',
           params: {
             type: 'confirmation',
@@ -64,10 +65,12 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
         });
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
-        returnedCreds = await SnapState.getBasicCredentialsForDescription(
-          credentialDescription,
-        );
-        return returnedCreds;
+        if (result === true) {
+          returnedCreds = await SnapState.getBasicCredentialsForDescription(
+            credentialDescription,
+          );
+          return returnedCreds;
+        }
       }
 
       return null;
@@ -76,7 +79,7 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
       credsRequestParams = request.params as CredsRequestParams;
       credentialDescription = credsRequestParams.credentialDescription;
       if (credentialDescription !== undefined) {
-        await snap.request({
+        result = await snap.request({
           method: 'snap_dialog',
           params: {
             type: 'confirmation',
@@ -86,14 +89,16 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
             ),
           },
         });
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore
-        console.log(`verified cred description: ${credentialDescription}`);
-        returnedCreds = await SnapState.getIdentityCredentialForDescription(
-          credentialDescription,
-        );
-        console.log(`verified cred return ${returnedCreds}`);
-        return returnedCreds;
+        if (result === true) {
+          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+          // @ts-ignore
+          console.log(`verified cred description: ${credentialDescription}`);
+          returnedCreds = await SnapState.getIdentityCredentialForDescription(
+            credentialDescription,
+          );
+          console.log(`verified cred return ${returnedCreds}`);
+          return returnedCreds;
+        }
       }
       return null;
 
@@ -104,7 +109,7 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
         `verifiable presentation credential description: ${credentialDescription}`,
       );
       if (credentialDescription !== undefined) {
-        await snap.request({
+        result = await snap.request({
           method: 'snap_dialog',
           params: {
             type: 'confirmation',
@@ -114,25 +119,26 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
             ),
           },
         });
-        let returnVP;
 
-        try {
-          returnVP = await SnapVerifiable.createVPFromVCs(
-            credentialDescription,
-            ['snap','googleDrive']
-          );
+        if (result === true) {
+          let returnVP;
+
+          try {
+            returnVP = await SnapVerifiable.createVPFromVCs(
+              credentialDescription,
+              ['snap', 'googleDrive']
+            );
+          } catch (Error) {
+            returnVP = await SnapVerifiable.createVPFromVCs(
+              credentialDescription,
+              ['snap']
+            );
+          }
+          // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+          console.log(`return from create VP: ${JSON.stringify(returnVP)}`);
+
+          return returnVP;
         }
-
-        catch(Error){
-          returnVP = await SnapVerifiable.createVPFromVCs(
-            credentialDescription,
-            ['snap']
-          );
-        }
-        // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-        console.log(`return from create VP: ${JSON.stringify(returnVP)}`);
-
-        return returnVP;
       }
       return null;
 
@@ -194,52 +200,15 @@ export const onHomePage: OnHomePageHandler = async () => {
 };
 
 export const onUserInput: OnUserInputHandler = async ({ id, event }) => {
-  let result, tempJSON;
+  let result;
 
   if (event.type === UserInputEventType.InputChangeEvent) {
     return;
   }
 
   if (event.type === UserInputEventType.FormSubmitEvent) {
-    let userName, pw, desc;
 
     switch (event.name) {
-      case 'password-save-form':
-        // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-        console.log(`Returned event values are ${JSON.stringify(event.value)}`);
-
-        userName = event.value['user-name'];
-        pw = event.value.password;
-        desc = event.value['credential-description'];
-
-        if (userName && pw && desc) {
-          const basicCredentials: SnapCredential = {
-            description: desc,
-            type: 'Basic',
-            credentialData: {
-              username: userName,
-              password: pw,
-            },
-          };
-
-          await SnapState.setCredential(basicCredentials);
-        }
-        break;
-      case 'vc-save-form':
-        // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-        console.log(`Returned event values are ${JSON.stringify(event.value)}`);
-        try {
-          await SnapVerifiable.saveDummyVerifiedCredentials();
-          console.log(`successfully saved dummy verified credentials`);
-        } catch (error: any) {
-          // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-          console.log(`error: ${error.message}`);
-        }
-        break;
-      case 'vp-create-form':
-        break;
-      case 'password-search-form':
-        break;
       default:
         console.log('no logic for this form');
     }
@@ -427,6 +396,7 @@ export const onUserInput: OnUserInputHandler = async ({ id, event }) => {
           catch(Error) {
             returnVP = await SnapVerifiable.createVPFromVCs(result, ['snap']);
           }
+
           // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
           console.log(`return from create VP: ${JSON.stringify(returnVP)}`);
 
