@@ -7,22 +7,27 @@ export class SnapCrypto {
    *
    * @param metamask - Metamask provider.
    */
-  public static async getCurrentNetwork(
-    metamask: SnapsEthereumProvider,
-  ): Promise<string> {
-    return (await metamask.request({
-      method: 'eth_chainId',
-    })) as string;
-  }
 
   public static async getCurrentMetamaskAccount(
     metamask: SnapsEthereumProvider,
   ): Promise<string> {
-    const accounts = (await metamask.request({
-      method: 'eth_requestAccounts',
-    })) as string[];
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
-    return accounts[0];
+    try {
+      const accounts = await metamask.request({
+        method: 'eth_requestAccounts',
+      }) as string[];
+
+      if (accounts[0] && accounts.length > 0) {
+        return accounts[0];
+      } else {
+        throw new Error("No MetaMask accounts found.");
+      }
+    } catch (error: unknown) {
+      let errorMessage = "An unknown error occurred while fetching MetaMask account.";
+      if (error instanceof Error) {
+        errorMessage = error.message;
+      }
+      console.error(`Error in getCurrentMetamaskAccount: ${errorMessage}`);
+      return '';
+    }
   }
 }
