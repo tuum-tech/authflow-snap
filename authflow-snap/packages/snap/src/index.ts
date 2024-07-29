@@ -19,6 +19,7 @@ import type {
   SnapCredential,
 } from './snap-types/SnapTypes';
 import { SnapViewModels } from './snap-view-models/snap-vm';
+import {SnapUtils} from "./snap-classes/SnapUtils";
 
 /**
  * Handle incoming JSON-RPC requests, sent through `wallet_invokeSnap`.
@@ -57,7 +58,7 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
           params: {
             type: 'confirmation',
             content: SnapViewModels.retrieveBasicCredsViewModel(
-              credentialDescription,
+              SnapUtils.stripNewlines(credentialDescription),
               origin,
             ),
           },
@@ -83,7 +84,7 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
           params: {
             type: 'confirmation',
             content: SnapViewModels.retrieveVerifiableCredsViewModel(
-              credentialDescription,
+              SnapUtils.stripNewlines(credentialDescription),
               origin,
             ),
           },
@@ -106,7 +107,7 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
           params: {
             type: 'confirmation',
             content: SnapViewModels.createVerifiablePresentationViewModel(
-              credentialDescription,
+              SnapUtils.stripNewlines(credentialDescription),
               origin,
             ),
           },
