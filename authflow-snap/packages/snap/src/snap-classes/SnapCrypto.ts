@@ -22,7 +22,8 @@ export class SnapCrypto {
 
       return '';
     } catch (error: unknown) {
-      const errorMessage = error instanceof Error ? error.message : "An unknown error occurred";
+      const errorMessage =
+        error instanceof Error ? error.message : 'An unknown error occurred';
       console.error(`Error in getCurrentMetamaskAccount: ${errorMessage}`);
       return '';
     }

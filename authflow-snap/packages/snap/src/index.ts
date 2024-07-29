@@ -208,7 +208,6 @@ export const onUserInput: OnUserInputHandler = async ({ id, event }) => {
   }
 
   if (event.type === UserInputEventType.ButtonClickEvent) {
-
     switch (event.name) {
       case 'btn-home-store': {
         const desc = await snap.request({

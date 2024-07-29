@@ -5,7 +5,6 @@ import {
   heading,
   copyable,
   divider,
-  input,
 } from '@metamask/snaps-sdk';
 
 import { SnapVerifiable } from '../snap-classes/SnapVerifiable';
