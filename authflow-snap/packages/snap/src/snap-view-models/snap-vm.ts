@@ -42,6 +42,13 @@ export class SnapViewModels {
     ]);
   }
 
+  public static clearOneVCViewModel(): Panel {
+    return panel([
+      heading('Clear all verified credentials?'),
+      text('Are you sure you want to clear all verified credentials?'),
+    ]);
+  }
+
   public static retrieveBasicCredsViewModel(
     description: string,
     site: string,
@@ -217,6 +224,22 @@ export class SnapViewModels {
     const returnPanel: any = [heading('Basic Credential')];
 
     returnPanel.push(text('Enter basic credential password'));
+
+    return panel(returnPanel);
+  }
+
+  public static async displayDeleteBasicPasswordViewModel(): Promise<Panel> {
+    const returnPanel: any = [heading('Delete A Basic Credential')];
+
+    returnPanel.push(text('Enter name of basic credential to delete'));
+
+    return panel(returnPanel);
+  }
+
+  public static async displayDeleteVerifiableCredentialViewModel(): Promise<Panel> {
+    const returnPanel: any = [heading('Delete A Verified Credential')];
+
+    returnPanel.push(text('Enter name of verified credential to delete'));
 
     return panel(returnPanel);
   }

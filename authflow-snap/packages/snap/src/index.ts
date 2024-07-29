@@ -153,6 +153,10 @@ export const onHomePage: OnHomePageHandler = async () => {
         name: 'btn-home-store',
       }),
       button({
+        value: 'Delete Single Password',
+        name: 'btn-home-delete-one-basic',
+      }),
+      button({
         value: 'Clear All Passwords',
         name: 'btn-home-clear',
       }),
@@ -168,6 +172,10 @@ export const onHomePage: OnHomePageHandler = async () => {
       button({
         value: 'Delete All Verified Credentials',
         name: 'btn-home-vc-delete-all',
+      }),
+      button({
+        value: 'Delete One Verified Credential',
+        name: 'btn-home-vc-delete-one',
       }),
       button({
         value: 'Rename Verified Credential',
@@ -270,6 +278,19 @@ export const onUserInput: OnUserInputHandler = async ({ id, event }) => {
           await SnapState.clearBasicCredentials();
         }
         break;
+      case 'btn-home-delete-one-basic': {
+        const name = await snap.request({
+          method: 'snap_dialog',
+          params: {
+            type: 'prompt',
+            content: await SnapViewModels.displayDeleteBasicPasswordViewModel(),
+          },
+        });
+        if(name) {
+          await SnapState.clearBasicCredential(name.toString());
+        }
+        break;
+      }
       case 'btn-home-vc-delete-all':
         result = await snap.request({
           method: 'snap_dialog',
@@ -283,6 +304,19 @@ export const onUserInput: OnUserInputHandler = async ({ id, event }) => {
           await SnapState.clearVerifiableCredentials();
         }
         break;
+      case 'btn-home-vc-delete-one': {
+        const name = await snap.request({
+          method: 'snap_dialog',
+          params: {
+            type: 'prompt',
+            content: await SnapViewModels.displayDeleteVerifiableCredentialViewModel(),
+          },
+        });
+        if(name) {
+          await SnapState.deleteVerifiedCredential(name.toString());
+        }
+        break;
+      }
       case 'btn-home-show':
         result = await snap.request({
           method: 'snap_dialog',

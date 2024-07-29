@@ -67,6 +67,37 @@ export class SnapState {
     }
   }
 
+  public static async clearBasicCredential(name: string) {
+    try {
+      const credentials = await SnapState.getCredentials();
+
+      if (credentials) {
+        Object.entries(credentials).forEach(([key, item]) => {
+          const snapCredential = item as SnapCredential;
+          if (snapCredential.type === 'Basic') {
+            if (snapCredential.description === name) {
+              delete credentials[key];
+            }
+          }
+        });
+
+        await snap.request({
+          method: 'snap_manageState',
+          params: {
+            operation: 'update',
+            newState: {
+              ...credentials,
+            },
+          },
+        });
+      } else {
+        console.log('No basic credential found to clear.');
+      }
+    } catch (error) {
+      console.error('Error clearing basic credential:', error);
+    }
+  }
+
   public static async clearVerifiableCredentials() {
     try {
       const credentials = await SnapState.getCredentials();
@@ -100,6 +131,51 @@ export class SnapState {
         await SnapVerifiable.clearAllIdentifyCredentials(['snap']);
       } catch (errorTwo) {
 
+      }
+    }
+  }
+
+  public static async deleteVerifiedCredential(name: string) {
+    let credentialId;
+    try {
+      const credentials = await SnapState.getCredentials();
+
+
+      if (credentials) {
+        Object.entries(credentials).forEach(([key, item]) => {
+          const snapCredential = item as SnapCredential;
+          if (snapCredential.type === 'Identify') {
+            if(snapCredential.description === name) {
+              const credentialData = snapCredential.credentialData as IdentifyCredential;
+              credentialId = credentialData.id;
+              delete credentials[key];
+            }
+          }
+        });
+
+        await snap.request({
+          method: 'snap_manageState',
+          params: {
+            operation: 'update',
+            newState: {
+              ...credentials,
+            },
+          },
+        });
+      }
+    } catch (error) {
+
+    }
+
+    if (credentialId) {
+      try {
+        await SnapVerifiable.clearIdentifyCredential(['snap', 'googleDrive'], credentialId);
+      } catch (error) {
+        try {
+          await SnapVerifiable.clearIdentifyCredential(['snap'], credentialId);
+        } catch (errorTwo) {
+
+        }
       }
     }
   }

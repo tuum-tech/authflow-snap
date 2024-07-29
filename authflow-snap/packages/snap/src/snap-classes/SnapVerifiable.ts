@@ -202,4 +202,40 @@ export class SnapVerifiable {
       throw new Error('unknown error: likely google not configured');
     }
   }
+
+  public static async clearIdentifyCredential(stores: string[], vcId: string) {
+    try {
+      const id = [vcId];
+      const metamaskAddress = await SnapCrypto.getCurrentMetamaskAccount(
+        ethereum,
+      );
+
+      const options = {
+        store: stores,
+      };
+
+      const params = {
+        metamaskAddress,
+        id,
+        options,
+      };
+
+      return JSON.stringify(
+        await snap.request({
+          method: 'wallet_invokeSnap',
+          params: {
+            snapId: 'npm:@tuum-tech/identify',
+            request: {
+              method: 'removeVC',
+              params,
+            },
+          },
+        }),
+      );
+    }
+    catch(error:unknown) {
+      const errorMessage = error instanceof Error ? error.message : "An unknown error occurred";
+      throw new Error('unknown error: likely google not configured');
+    }
+  }
 }
