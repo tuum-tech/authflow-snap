@@ -22,11 +22,7 @@ export class SnapCrypto {
 
       return '';
     } catch (error: unknown) {
-      let errorMessage =
-        'An unknown error occurred while fetching MetaMask account.';
-      if (error instanceof Error) {
-        errorMessage = error.message;
-      }
+      const errorMessage = error instanceof Error ? error.message : "An unknown error occurred";
       console.error(`Error in getCurrentMetamaskAccount: ${errorMessage}`);
       return '';
     }

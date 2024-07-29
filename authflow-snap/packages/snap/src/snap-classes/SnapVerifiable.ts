@@ -74,6 +74,7 @@ export class SnapVerifiable {
       });
     } catch (error: unknown) {
       const errorMessage = error instanceof Error ? error.message : "An unknown error occurred";
+      console.error(`Error in createVPFromVC's: ${errorMessage}`);
       throw new Error('unknown error: likely google not configured');
     }
   }
@@ -112,6 +113,7 @@ export class SnapVerifiable {
     }
     catch (error:unknown) {
       const errorMessage = error instanceof Error ? error.message : "An unknown error occurred";
+      console.error(`Error in getVCForKey: ${errorMessage}`);
       throw new Error('unknown error: likely google not configured');
     }
   }
@@ -165,6 +167,7 @@ export class SnapVerifiable {
       await SnapState.setCredential(newIdentifyCredential);
     } catch (error: unknown) {
       const errorMessage = error instanceof Error ? error.message : "An unknown error occurred";
+      console.error(`Error in seedVerifiableCredentials: ${errorMessage}`);
       throw new Error('unknown error: likely google not configured');
     }
   }
@@ -199,6 +202,7 @@ export class SnapVerifiable {
     }
     catch(error:unknown) {
       const errorMessage = error instanceof Error ? error.message : "An unknown error occurred";
+      console.error(`Error in clearAllIdentifyCredentials: ${errorMessage}`);
       throw new Error('unknown error: likely google not configured');
     }
   }
@@ -235,6 +239,7 @@ export class SnapVerifiable {
     }
     catch(error:unknown) {
       const errorMessage = error instanceof Error ? error.message : "An unknown error occurred";
+      console.error(`Error in clearIdentifyCredential: ${errorMessage}`);
       throw new Error('unknown error: likely google not configured');
     }
   }

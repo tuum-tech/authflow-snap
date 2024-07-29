@@ -21,7 +21,8 @@ export class SnapState {
         console.log('No credentials found.');
       }
     } catch (error) {
-      console.error('Error fetching credentials:', error);
+      const errorMessage = error instanceof Error ? error.message : "An unknown error occurred";
+      console.error(`Error in outputCredentialsToConsole: ${errorMessage}`);
     }
   }
 
@@ -32,8 +33,9 @@ export class SnapState {
         params: { operation: 'get' },
       });
       return credentials;
-    } catch (error) {
-      console.error('Error fetching credentials:', error);
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : "An unknown error occurred";
+      console.error(`Error in getCredentials: ${errorMessage}`);
       return null;
     }
   }
@@ -62,8 +64,9 @@ export class SnapState {
       } else {
         console.log('No basic credentials found to clear.');
       }
-    } catch (error) {
-      console.error('Error clearing basic credentials:', error);
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : "An unknown error occurred";
+      console.error(`Error in clearBasicCredentials: ${errorMessage}`);
     }
   }
 
@@ -93,8 +96,9 @@ export class SnapState {
       } else {
         console.log('No basic credential found to clear.');
       }
-    } catch (error) {
-      console.error('Error clearing basic credential:', error);
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : "An unknown error occurred";
+      console.error(`Error in clearBasicCredential ${errorMessage}`);
     }
   }
 
@@ -120,8 +124,9 @@ export class SnapState {
           },
         });
       }
-    } catch (error) {
-
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : "An unknown error occurred";
+      console.error(`Error in clearVerifiableCredentials: ${errorMessage}`);
     }
 
     try {
@@ -129,8 +134,9 @@ export class SnapState {
     } catch (error) {
       try {
         await SnapVerifiable.clearAllIdentifyCredentials(['snap']);
-      } catch (errorTwo) {
-
+      } catch (errorTwo: unknown) {
+        const errorMessage = errorTwo instanceof Error ? errorTwo.message : "An unknown error occurred";
+        console.error(`Error in clearVerifiableCredentials: ${errorMessage}`);
       }
     }
   }
@@ -163,8 +169,9 @@ export class SnapState {
           },
         });
       }
-    } catch (error) {
-
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : "An unknown error occurred";
+      console.error(`Error in deleteVerifiedCredential: ${errorMessage}`);
     }
 
     if (credentialId) {
@@ -173,8 +180,9 @@ export class SnapState {
       } catch (error) {
         try {
           await SnapVerifiable.clearIdentifyCredential(['snap'], credentialId);
-        } catch (errorTwo) {
-
+        } catch (errorTwo: unknown) {
+          const errorMessage = errorTwo instanceof Error ? errorTwo.message : "An unknown error occurred";
+          console.error(`Error in deleteVerifiedCredential: ${errorMessage}`);
         }
       }
     }
@@ -209,8 +217,9 @@ export class SnapState {
       console.log(
         `Credential of type ${credential.type} added with UUID ${newUUID}`,
       );
-    } catch (error) {
-      console.error('Error setting credential:', error);
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : "An unknown error occurred";
+      console.error(`Error in setCredential: ${errorMessage}`);
     }
   }
 
@@ -252,8 +261,9 @@ export class SnapState {
         username: '',
         password: '',
       };
-    } catch (error) {
-      console.error('Error getting basic credentials for description:', error);
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : "An unknown error occurred";
+      console.error(`Error in getBasicCredentialsForDescription: ${errorMessage}`);
       return {
         username: '',
         password: '',
@@ -292,16 +302,17 @@ export class SnapState {
           try {
             const vcJSON = await SnapVerifiable.getVCForKey(['snap'], vcKey);
             return vcJSON;
-          } catch (errorTwo) {}
+          } catch (errorTwo: unknown) {
+            const errorMessage = errorTwo instanceof Error ? errorTwo.message : "An unknown error occurred";
+            console.error(`Error in getIdentityCredentialForDescription: ${errorMessage}`);
+          }
         }
       }
 
       return null;
-    } catch (error) {
-      console.error(
-        'Error getting identity credential for description:',
-        error,
-      );
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : "An unknown error occurred";
+      console.error(`Error in getIdentityCredentialForDescription: ${errorMessage}`);
       return null;
     }
   }
@@ -310,7 +321,7 @@ export class SnapState {
     try {
       const googleResult = await this.syncGoogleCredentials();
 
-      let identifyCredentialsString: string;
+      let identifyCredentialsString: string = '';
       try {
         identifyCredentialsString =
           await SnapVerifiable.getVerifiableCredentials([
@@ -318,8 +329,14 @@ export class SnapState {
             'googleDrive',
           ]);
       } catch (error) {
-        identifyCredentialsString =
-          await SnapVerifiable.getVerifiableCredentials(['snap']);
+        try {
+          identifyCredentialsString =
+            await SnapVerifiable.getVerifiableCredentials(['snap']);
+        }
+        catch (errorTwo: unknown) {
+          const errorMessage = errorTwo instanceof Error ? errorTwo.message : "An unknown error occurred";
+          console.error(`Error in syncCredentials: ${errorMessage}`);
+        }
       }
 
       const identifyCredentials = JSON.parse(identifyCredentialsString);
@@ -339,8 +356,9 @@ export class SnapState {
       }
 
       await this.outputCredentialsToConsole();
-    } catch (error) {
-      console.error('Error during syncCredentials:', error);
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : "An unknown error occurred";
+      console.error(`Error in syncCredentials: ${errorMessage}`);
     }
   }
 
@@ -362,8 +380,9 @@ export class SnapState {
         return [data.metadata.id];
       }
       return [];
-    } catch (error) {
-      console.error('Error extracting IDs from identify data:', error);
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : "An unknown error occurred";
+      console.error(`Error in getIdsFromIdentifyData: ${errorMessage}`);
       return [];
     }
   }
@@ -406,8 +425,9 @@ export class SnapState {
       } else {
         console.log('No credentials found.');
       }
-    } catch (error) {
-      console.error('Error renaming identify credential:', error);
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : "An unknown error occurred";
+      console.error(`Error in renameIdentifyCredential: ${errorMessage}`);
     }
   }
 
@@ -432,8 +452,9 @@ export class SnapState {
       }
 
       return vcIds;
-    } catch (error) {
-      console.error('Error getting identify IDs for names:', error);
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : "An unknown error occurred";
+      console.error(`Error in getIdentifyIdsForNames: ${errorMessage}`);
       return [];
     }
   }
@@ -459,12 +480,10 @@ export class SnapState {
       });
 
       return result;
-    } catch (error) {
-      let errorMessage = 'An unknown error occurred';
-      if (error instanceof Error) {
-        errorMessage = error.message;
-      }
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : "An unknown error occurred";
       console.error(`Error in syncGoogleCredentials: ${errorMessage}`);
+
       return null;
     }
   }

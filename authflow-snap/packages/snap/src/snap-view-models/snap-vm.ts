@@ -115,7 +115,7 @@ export class SnapViewModels {
       return panel(returnPanel);
     } catch (error: unknown) {
       const errorMessage = error instanceof Error ? error.message : "An unknown error occurred";
-      console.error(`Error in getVerifiableCredentials: ${errorMessage}`);
+      console.error(`Error in displayBasicCredentialsViewModel: ${errorMessage}`);
       return this.failureViewModel();
     }
   }
@@ -168,7 +168,7 @@ export class SnapViewModels {
         return panel(returnPanel);
       } catch (error: unknown) {
         const errorMessage = error instanceof Error ? error.message : "An unknown error occurred";
-        console.error(`Error in getVerifiableCredentials: ${errorMessage}`);
+        console.error(`Error in displayVerifiedCredentialsViewModel: ${errorMessage}`);
         return panel(returnPanel);
       }
     }
