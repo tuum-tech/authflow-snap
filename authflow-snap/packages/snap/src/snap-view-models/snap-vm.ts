@@ -24,19 +24,8 @@ export class SnapViewModels {
     ]);
   }
 
-  public static successViewModel(): Panel {
-    return panel([heading(`Success`), text(`Password successfully stored!`)]);
-  }
-
   public static failureViewModel(): Panel {
-    return panel([heading(`Failure`), text(`Error: No passwords stored!`)]);
-  }
-
-  public static searchViewModel(): Panel {
-    return panel([
-      heading('Search Passwords'),
-      text('Please enter the search term'),
-    ]);
+    return panel([heading(`Failure`), text(`Error: No credentials stored!`)]);
   }
 
   public static clearAllViewModel(): Panel {
@@ -86,19 +75,7 @@ export class SnapViewModels {
         `Create verifiable presentation for verifiable credential(s) ${description}`,
       ),
       text(
-        `Are you sure you want to create a verifiable presentation for ${description} to ${site}?`,
-      ),
-    ]);
-  }
-
-  public static displayVPConfirmationViewModel(
-    description: string,
-    site: string,
-  ): Panel {
-    return panel([
-      heading(`Create verifiable presentation from VC's: ${description}`),
-      text(
-        `Are you sure you want to create a verifiable presentation for verifiable credential${description} and send to ${site}?`,
+        `Are you sure you want to create a verifiable presentation for ${description} and send to ${site}?`,
       ),
     ]);
   }
@@ -130,10 +107,10 @@ export class SnapViewModels {
       });
 
       return panel(returnPanel);
-    } catch (error: any) {
-      // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-      console.error(`error: ${error.message}`);
-      return panel(returnPanel);
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : "An unknown error occurred";
+      console.error(`Error in getVerifiableCredentials: ${errorMessage}`);
+      return this.failureViewModel();
     }
   }
 
@@ -149,58 +126,54 @@ export class SnapViewModels {
     let identifyCredentials;
     try {
       identifyCredentials = await SnapVerifiable.getVerifiableCredentials([
-        'snap', 'googleDrive'
+        'snap',
+        'googleDrive',
       ]);
-    }
-
-    catch(Error) {
+    } catch (error:unknown) {
       identifyCredentials = await SnapVerifiable.getVerifiableCredentials([
-        'snap'
+        'snap',
       ]);
     }
 
-    const identifyCredValues: any[] = JSON.parse(identifyCredentials);
-    const identifyCredTable: Record<string, any> = {};
-    identifyCredValues.forEach((item) => {
-      identifyCredTable[item.metadata.id] = item.data;
-    });
+    if(identifyCredentials) {
 
-    try {
-      Object.entries(credentials).forEach(([key, value]) => {
-        if (value !== null) {
-          const cred = value as SnapCredential;
-          if (cred.type === 'Identify') {
-            const credId = (cred.credentialData as IdentifyCredential).id;
-            returnPanel.push(copyable(cred.description));
-            returnPanel.push(copyable(credId));
-            returnPanel.push(
-              copyable(JSON.stringify(identifyCredTable[credId])),
-            );
-            returnPanel.push(divider());
-          }
-        }
+      const identifyCredValues: any[] = JSON.parse(identifyCredentials);
+      const identifyCredTable: Record<string, any> = {};
+      identifyCredValues.forEach((item) => {
+        identifyCredTable[item.metadata.id] = item.data;
       });
 
-      return panel(returnPanel);
-    } catch (error: any) {
-      // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-      console.error(`error: ${error.message}`);
-      return panel(returnPanel);
+      try {
+        Object.entries(credentials).forEach(([key, value]) => {
+          if (value !== null) {
+            const cred = value as SnapCredential;
+            if (cred.type === 'Identify') {
+              const credId = (cred.credentialData as IdentifyCredential).id;
+              returnPanel.push(copyable(cred.description));
+              returnPanel.push(copyable(credId));
+              returnPanel.push(
+                copyable(JSON.stringify(identifyCredTable[credId])),
+              );
+              returnPanel.push(divider());
+            }
+          }
+        });
+
+        return panel(returnPanel);
+      } catch (error: unknown) {
+        const errorMessage = error instanceof Error ? error.message : "An unknown error occurred";
+        console.error(`Error in getVerifiableCredentials: ${errorMessage}`);
+        return panel(returnPanel);
+      }
     }
+
+    return this.failureViewModel();
   }
 
   public static async displayRenameVerifiableCredentialViewModel(): Promise<Panel> {
     const returnPanel: any = [heading('Rename Verifiable Credential')];
 
     returnPanel.push(text('Enter name'));
-
-    return panel(returnPanel);
-  }
-
-  public static async displayConfigureGoogleViewModel(): Promise<Panel> {
-    const returnPanel: any = [heading('Configure Google Drive')];
-
-    returnPanel.push(text('Enter Google access token'));
 
     return panel(returnPanel);
   }

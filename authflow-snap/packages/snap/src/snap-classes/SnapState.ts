@@ -264,7 +264,7 @@ export class SnapState {
           identifyIds,
         )}`,
       );
-      const authflowCredentials = await this.getCredentials();
+      let authflowCredentials = await this.getCredentials();
       console.log(
         `authflow credentials: ${JSON.stringify(authflowCredentials)}`,
       );
@@ -276,6 +276,9 @@ export class SnapState {
 
       if (identifyCredentials && identifyIds && authflowCredentials) {
         await this.updateCredentials(identifyIds, authflowCredentials);
+        console.log('credentials after updateCredentials');
+        await this.outputCredentialsToConsole();
+        authflowCredentials = await this.getCredentials();
         await this.removeObsoleteCredentials(
           authflowCredentials,
           identifyIdSet,
@@ -471,7 +474,6 @@ export class SnapState {
         const newUUID = uuidv4();
         const newCredData: IdentifyCredential = {
           id: identifyId,
-          store: 'snap',
         };
         const newCred: SnapCredential = {
           description: identifyId,
@@ -485,16 +487,7 @@ export class SnapState {
           )} ${JSON.stringify(newCred)}`,
         );
 
-        await snap.request({
-          method: 'snap_manageState',
-          params: {
-            operation: 'update',
-            newState: {
-              ...authflowCredentials,
-              [newUUID]: newCred,
-            },
-          },
-        });
+        await this.setCredential(newCred);
       }
     }
   }

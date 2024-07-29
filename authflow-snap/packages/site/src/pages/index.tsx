@@ -25,8 +25,7 @@ import type {
   BasicCredsDisplayHandle,
   VerifiableCredsDisplayHandle,
   UserCredentials,
-  VerifiableCredentials,
-  VerifiablePresentationDisplayHandle
+  VerifiablePresentationDisplayHandle,
 } from '../types/snap';
 import { isLocalSnap, shouldDisplayReconnectButton } from '../utils';
 
@@ -130,7 +129,8 @@ const Index = () => {
 
   const basicCredsRef = useRef<BasicCredsDisplayHandle>(null);
   const verifiableCredsRef = useRef<VerifiableCredsDisplayHandle>(null);
-  const verifiablePresentationRef = useRef<VerifiablePresentationDisplayHandle>(null);
+  const verifiablePresentationRef =
+    useRef<VerifiablePresentationDisplayHandle>(null);
 
   const handleGetBasicCredsClick = async () => {
     if (basicCredsRef.current) {
@@ -167,14 +167,17 @@ const Index = () => {
       const verifiablePresentation = await invokeSnap({
         method: 'createVerifiablePresentation',
         params: {
-          credentialDescription: verifiablePresentationRef.current.getDescription(),
+          credentialDescription:
+            verifiablePresentationRef.current.getDescription(),
         },
       });
       console.log(verifiablePresentation);
       console.log(JSON.stringify(verifiablePresentation));
       console.log(verifiablePresentationRef);
 
-      verifiablePresentationRef.current.setVP(JSON.stringify(verifiablePresentation));
+      verifiablePresentationRef.current.setVP(
+        JSON.stringify(verifiablePresentation),
+      );
     }
   };
 

@@ -9,7 +9,6 @@ export type CredsRequestParams = {
 
 export type IdentifyCredential = {
   id: string;
-  store: string;
 };
 
 export type SnapCredential = {

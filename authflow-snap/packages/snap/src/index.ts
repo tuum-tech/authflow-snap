@@ -14,7 +14,6 @@ import { divider } from '@metamask/snaps-ui';
 
 import { SnapState } from './snap-classes/SnapState';
 import { SnapVerifiable } from './snap-classes/SnapVerifiable';
-import { SnapUiInterfaces } from './snap-interfaces/snap-ui-interfaces';
 import type {
   CredsRequestParams,
   SnapCredential,
@@ -199,10 +198,6 @@ export const onHomePage: OnHomePageHandler = async () => {
 export const onUserInput: OnUserInputHandler = async ({ id, event }) => {
   let result;
 
-  if (event.type === UserInputEventType.InputChangeEvent) {
-    return;
-  }
-
   if (event.type === UserInputEventType.FormSubmitEvent) {
     switch (event.name) {
       default:
@@ -299,15 +294,6 @@ export const onUserInput: OnUserInputHandler = async ({ id, event }) => {
           },
         });
         break;
-      case 'btn-home-search':
-        result = await snap.request({
-          method: 'snap_dialog',
-          params: {
-            type: 'alert',
-            id: await SnapUiInterfaces.createPasswordSearchInterface(),
-          },
-        });
-        break;
       case 'btn-select-cred':
         break;
       case 'btn-home-vc-show':
@@ -318,15 +304,6 @@ export const onUserInput: OnUserInputHandler = async ({ id, event }) => {
             content: await SnapViewModels.displayVerifiableCredentialsViewModel(
               await SnapState.getCredentials(),
             ),
-          },
-        });
-        break;
-      case 'btn-home-vc-save':
-        result = await snap.request({
-          method: 'snap_dialog',
-          params: {
-            type: 'alert',
-            id: await SnapUiInterfaces.createVCSaveInterface(),
           },
         });
         break;
@@ -343,9 +320,9 @@ export const onUserInput: OnUserInputHandler = async ({ id, event }) => {
       case 'btn-home-sync':
         try {
           result = await SnapState.syncCredentials();
-        } catch (error: any) {
-          // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-          console.error(`error : ${error.message}`);
+        } catch (error: unknown) {
+          const errorMessage = error instanceof Error ? error.message : "An unknown error occurred";
+          console.error(`Error in synchronizing: ${errorMessage}`);
         }
         break;
       case 'btn-home-debug':
@@ -408,7 +385,6 @@ export const onUserInput: OnUserInputHandler = async ({ id, event }) => {
             returnVP = await SnapVerifiable.createVPFromVCs(result, ['snap']);
           }
 
-          // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
           console.log(`return from create VP: ${JSON.stringify(returnVP)}`);
 
           await snap.request({
