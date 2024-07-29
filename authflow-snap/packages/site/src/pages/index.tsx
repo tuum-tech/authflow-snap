@@ -154,9 +154,6 @@ const Index = () => {
           credentialDescription: verifiableCredsRef.current.getDescription(),
         },
       });
-      console.log(verifiableCreds);
-      console.log(JSON.stringify(verifiableCreds));
-      console.log(verifiableCredsRef);
 
       verifiableCredsRef.current.setVC(JSON.stringify(verifiableCreds));
     }
@@ -171,9 +168,6 @@ const Index = () => {
             verifiablePresentationRef.current.getDescription(),
         },
       });
-      console.log(verifiablePresentation);
-      console.log(JSON.stringify(verifiablePresentation));
-      console.log(verifiablePresentationRef);
 
       verifiablePresentationRef.current.setVP(
         JSON.stringify(verifiablePresentation),

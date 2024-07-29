@@ -89,11 +89,9 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
           },
         });
         if (result === true) {
-          console.log(`verified cred description: ${credentialDescription}`);
           returnedCreds = await SnapState.getIdentityCredentialForDescription(
             credentialDescription,
           );
-          console.log(`verified cred return ${JSON.stringify(returnedCreds)}`);
           return returnedCreds;
         }
       }
@@ -102,9 +100,6 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
     case 'createVerifiablePresentation':
       credsRequestParams = request.params as CredsRequestParams;
       credentialDescription = credsRequestParams.credentialDescription;
-      console.log(
-        `verifiable presentation credential description: ${credentialDescription}`,
-      );
       if (credentialDescription !== undefined) {
         result = await snap.request({
           method: 'snap_dialog',
@@ -131,7 +126,6 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
               ['snap'],
             );
           }
-          console.log(`return from create VP: ${JSON.stringify(returnVP)}`);
 
           return returnVP;
         }
@@ -214,7 +208,6 @@ export const onUserInput: OnUserInputHandler = async ({ id, event }) => {
   }
 
   if (event.type === UserInputEventType.ButtonClickEvent) {
-    console.log(`The interface being acted on is ${id}`);
 
     switch (event.name) {
       case 'btn-home-store': {
@@ -252,17 +245,7 @@ export const onUserInput: OnUserInputHandler = async ({ id, event }) => {
             },
           };
           await SnapState.setCredential(newBasicSnapCredential);
-          console.log(
-            `created basic credential: ${JSON.stringify(
-              newBasicSnapCredential,
-            )}`,
-          );
         }
-        console.log(
-          `data from enter basic: ${JSON.stringify(desc)} ${JSON.stringify(
-            user,
-          )} ${JSON.stringify(pw)}`,
-        );
         break;
       }
       case 'btn-home-clear':
@@ -286,7 +269,7 @@ export const onUserInput: OnUserInputHandler = async ({ id, event }) => {
             content: await SnapViewModels.displayDeleteBasicPasswordViewModel(),
           },
         });
-        if(name) {
+        if (name) {
           await SnapState.clearBasicCredential(name.toString());
         }
         break;
@@ -309,10 +292,11 @@ export const onUserInput: OnUserInputHandler = async ({ id, event }) => {
           method: 'snap_dialog',
           params: {
             type: 'prompt',
-            content: await SnapViewModels.displayDeleteVerifiableCredentialViewModel(),
+            content:
+              await SnapViewModels.displayDeleteVerifiableCredentialViewModel(),
           },
         });
-        if(name) {
+        if (name) {
           await SnapState.deleteVerifiedCredential(name.toString());
         }
         break;
@@ -355,7 +339,10 @@ export const onUserInput: OnUserInputHandler = async ({ id, event }) => {
         try {
           result = await SnapState.syncCredentials();
         } catch (error: unknown) {
-          const errorMessage = error instanceof Error ? error.message : "An unknown error occurred";
+          const errorMessage =
+            error instanceof Error
+              ? error.message
+              : 'An unknown error occurred';
           console.error(`Error in synchronizing: ${errorMessage}`);
         }
         break;
@@ -390,8 +377,6 @@ export const onUserInput: OnUserInputHandler = async ({ id, event }) => {
         ) {
           await SnapState.renameIdentifyCredential(vcId, newName);
         }
-        console.log(`rename cred result ${JSON.stringify(vcId)}`);
-        console.log(`rename cred result ${JSON.stringify(newName)}`);
         break;
       }
       case 'btn-home-vp-create':
@@ -404,10 +389,7 @@ export const onUserInput: OnUserInputHandler = async ({ id, event }) => {
             placeholder: 'credential1,credential2',
           },
         });
-        console.log(
-          // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-          `return from verified presentation prompt: ${typeof result} ${result}`,
-        );
+
         if (result) {
           let returnVP;
           try {
@@ -418,8 +400,6 @@ export const onUserInput: OnUserInputHandler = async ({ id, event }) => {
           } catch (error) {
             returnVP = await SnapVerifiable.createVPFromVCs(result, ['snap']);
           }
-
-          console.log(`return from create VP: ${JSON.stringify(returnVP)}`);
 
           await snap.request({
             method: 'snap_dialog',

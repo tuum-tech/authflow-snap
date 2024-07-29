@@ -97,8 +97,7 @@ export class SnapViewModels {
     }
 
     try {
-      Object.entries(credentials).forEach(([key, value]) => {
-        console.log(`Key: ${key}, Value:`, value);
+      Object.values(credentials).forEach((value) => {
 
         if (value !== null) {
           const cred = value as SnapCredential;

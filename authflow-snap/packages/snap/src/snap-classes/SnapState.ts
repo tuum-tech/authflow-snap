@@ -222,8 +222,7 @@ export class SnapState {
       let returnCredentials;
 
       if (credentials) {
-        for (const [key, value] of Object.entries(credentials)) {
-          console.log(`Key: ${key}, Value:`, value);
+        for (const value of Object.values(credentials)) {
           const snapCredential = value as SnapCredential;
 
           if (snapCredential && snapCredential.description === description) {
@@ -268,8 +267,7 @@ export class SnapState {
       let vcKey;
 
       if (credentials) {
-        for (const [key, value] of Object.entries(credentials)) {
-          console.log(`Key: ${key}, Value:`, value);
+        for (const value of Object.values(credentials)) {
           const snapCredential = value as SnapCredential;
 
           if (snapCredential && snapCredential.description === description) {
@@ -311,9 +309,6 @@ export class SnapState {
   public static async syncCredentials() {
     try {
       const googleResult = await this.syncGoogleCredentials();
-      console.log(
-        `googleResult in syncCredentials: ${JSON.stringify(googleResult)}`,
-      );
 
       let identifyCredentialsString: string;
       try {
@@ -322,37 +317,19 @@ export class SnapState {
             'snap',
             'googleDrive',
           ]);
-        console.log(
-          `identifyCredentialsString after multi-store call: ${identifyCredentialsString}`,
-        );
       } catch (error) {
         identifyCredentialsString =
           await SnapVerifiable.getVerifiableCredentials(['snap']);
-        console.log(
-          `identifyCredentialsString after single snap store call: ${identifyCredentialsString}`,
-        );
       }
 
       const identifyCredentials = JSON.parse(identifyCredentialsString);
       const identifyIds = this.getIdsFromIdentifyData(identifyCredentials);
-      console.log(
-        `identify ids after getting from identity data: ${JSON.stringify(
-          identifyIds,
-        )}`,
-      );
       let authflowCredentials = await this.getCredentials();
-      console.log(
-        `authflow credentials: ${JSON.stringify(authflowCredentials)}`,
-      );
 
       const identifyIdSet = new Set(identifyIds);
-      console.log(
-        `Set from identify ids: ${JSON.stringify(Array.from(identifyIdSet))}`,
-      );
 
       if (identifyCredentials && identifyIds && authflowCredentials) {
         await this.updateCredentials(identifyIds, authflowCredentials);
-        console.log('credentials after updateCredentials');
         await this.outputCredentialsToConsole();
         authflowCredentials = await this.getCredentials();
         await this.removeObsoleteCredentials(
@@ -361,7 +338,6 @@ export class SnapState {
         );
       }
 
-      console.log(`credentials after sync: `);
       await this.outputCredentialsToConsole();
     } catch (error) {
       console.error('Error during syncCredentials:', error);
@@ -395,36 +371,22 @@ export class SnapState {
   public static async renameIdentifyCredential(id: string, name: string) {
     try {
       const credentials = await SnapState.getCredentials();
-      console.log('Fetched credentials:', JSON.stringify(credentials));
 
       if (credentials) {
         let isUpdated = false;
 
         for (const [key, value] of Object.entries(credentials)) {
           const snapCredential = value as SnapCredential;
-          console.log('Processing credential:', JSON.stringify(snapCredential));
 
           if (snapCredential.type === 'Identify') {
             const credentialData =
               snapCredential.credentialData as IdentifyCredential;
-            console.log(`id from argument: ${id}`);
-            console.log(`id from credential collection: ${credentialData.id}`);
 
             if (credentialData.id === id) {
-              console.log(
-                `snap credential description: ${snapCredential.description}`,
-              );
-              console.log(`new name description: ${name}`);
-
               snapCredential.description = name;
-              console.log(
-                'Updated snap credential:',
-                JSON.stringify(snapCredential),
-              );
 
               credentials[key] = snapCredential;
               isUpdated = true;
-              console.log('Updated credentials:', JSON.stringify(credentials));
             }
           }
         }
@@ -496,7 +458,6 @@ export class SnapState {
         },
       });
 
-      console.log('Sync Google Credentials Result:', result);
       return result;
     } catch (error) {
       let errorMessage = 'An unknown error occurred';
@@ -518,7 +479,6 @@ export class SnapState {
         const identifyCredentialData =
           snapCredential.credentialData as IdentifyCredential;
         if (!identifyIdSet.has(identifyCredentialData.id)) {
-          console.log(`here we would delete ${identifyCredentialData.id}`);
           delete authflowCredentials[key];
         }
       }
@@ -538,14 +498,13 @@ export class SnapState {
     authflowCredentials: any,
   ) {
     for (const identifyId of identifyIds) {
-      console.log(`identify id in loop: ${identifyId}`);
       const existsInCollection = Object.values(authflowCredentials).some(
         (credential) =>
           (credential as SnapCredential).type === 'Identify' &&
           ((credential as SnapCredential).credentialData as IdentifyCredential)
             .id === identifyId,
       );
-      console.log(`exists in collection? ${existsInCollection}`);
+
       if (!existsInCollection) {
         const newUUID = uuidv4();
         const newCredData: IdentifyCredential = {
@@ -556,12 +515,6 @@ export class SnapState {
           type: 'Identify',
           credentialData: newCredData,
         };
-
-        console.log(
-          `data when it doesn't exist in the collection: ${newUUID} ${JSON.stringify(
-            newCredData,
-          )} ${JSON.stringify(newCred)}`,
-        );
 
         await this.setCredential(newCred);
       }
