@@ -13,13 +13,13 @@ import {
 import { divider } from '@metamask/snaps-ui';
 
 import { SnapState } from './snap-classes/SnapState';
+import { SnapUtils } from './snap-classes/SnapUtils';
 import { SnapVerifiable } from './snap-classes/SnapVerifiable';
 import type {
   CredsRequestParams,
   SnapCredential,
 } from './snap-types/SnapTypes';
 import { SnapViewModels } from './snap-view-models/snap-vm';
-import {SnapUtils} from "./snap-classes/SnapUtils";
 
 /**
  * Handle incoming JSON-RPC requests, sent through `wallet_invokeSnap`.
