@@ -208,10 +208,6 @@ export class SnapState {
       const credentials = await this.getCredentials();
       const newUUID = uuidv4();
 
-      if (!credentials) {
-        throw new Error('Failed to retrieve existing credentials.');
-      }
-
       const updatedCredentials = {
         ...credentials,
         [newUUID]: {
