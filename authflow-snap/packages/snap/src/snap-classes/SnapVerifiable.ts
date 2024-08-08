@@ -16,7 +16,7 @@ export class SnapVerifiable {
         store: stores,
       };
 
-      const filter = undefined;
+      const filter = null;
 
       const params = {
         metamaskAddress,
@@ -40,7 +40,7 @@ export class SnapVerifiable {
       const errorMessage =
         error instanceof Error ? error.message : 'An unknown error occurred';
       console.error(`Error in getVerifiableCredentials: ${errorMessage}`);
-      throw new Error('Error in identify: likely google not configured');
+      throw new Error(`Error in identify: ${errorMessage}, likely google not configured`);
     }
   }
 

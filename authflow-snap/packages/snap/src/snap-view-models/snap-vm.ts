@@ -1,11 +1,5 @@
 import type { ManageStateResult, Panel } from '@metamask/snaps-sdk';
-import {
-  panel,
-  text,
-  heading,
-  copyable,
-  divider,
-} from '@metamask/snaps-sdk';
+import { panel, text, heading, copyable, divider } from '@metamask/snaps-sdk';
 
 import { SnapVerifiable } from '../snap-classes/SnapVerifiable';
 import type {
@@ -97,7 +91,6 @@ export class SnapViewModels {
 
     try {
       Object.values(credentials).forEach((value) => {
-
         if (value !== null) {
           const cred = value as SnapCredential;
           if (cred.type === 'Basic') {
@@ -113,8 +106,11 @@ export class SnapViewModels {
 
       return panel(returnPanel);
     } catch (error: unknown) {
-      const errorMessage = error instanceof Error ? error.message : "An unknown error occurred";
-      console.error(`Error in displayBasicCredentialsViewModel: ${errorMessage}`);
+      const errorMessage =
+        error instanceof Error ? error.message : 'An unknown error occurred';
+      console.error(
+        `Error in displayBasicCredentialsViewModel: ${errorMessage}`,
+      );
       return this.failureViewModel();
     }
   }
@@ -134,14 +130,13 @@ export class SnapViewModels {
         'snap',
         'googleDrive',
       ]);
-    } catch (error:unknown) {
+    } catch (error: unknown) {
       identifyCredentials = await SnapVerifiable.getVerifiableCredentials([
         'snap',
       ]);
     }
 
-    if(identifyCredentials) {
-
+    if (identifyCredentials) {
       const identifyCredValues: any[] = JSON.parse(identifyCredentials);
       const identifyCredTable: Record<string, any> = {};
       identifyCredValues.forEach((item) => {
@@ -166,8 +161,11 @@ export class SnapViewModels {
 
         return panel(returnPanel);
       } catch (error: unknown) {
-        const errorMessage = error instanceof Error ? error.message : "An unknown error occurred";
-        console.error(`Error in displayVerifiedCredentialsViewModel: ${errorMessage}`);
+        const errorMessage =
+          error instanceof Error ? error.message : 'An unknown error occurred';
+        console.error(
+          `Error in displayVerifiedCredentialsViewModel: ${errorMessage}`,
+        );
         return panel(returnPanel);
       }
     }

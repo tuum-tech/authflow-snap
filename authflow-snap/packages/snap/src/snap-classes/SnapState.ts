@@ -342,7 +342,7 @@ export class SnapState {
 
   public static async syncCredentials() {
     try {
-      const googleResult = await this.syncGoogleCredentials();
+      await this.syncGoogleCredentials();
 
       let identifyCredentialsString = '';
       try {
@@ -405,7 +405,7 @@ export class SnapState {
       ) {
         return [data.metadata.id];
       }
-      return [];
+      throw new Error('Not a valid input object');
     } catch (error: unknown) {
       const errorMessage =
         error instanceof Error ? error.message : 'An unknown error occurred';
