@@ -18,7 +18,7 @@ export class SnapViewModels {
   public static helloViewModel(origin: string): Panel {
     return panel([
       copyable(`Hello, **${origin}**!`),
-      text('This is an authflow test message!!'),
+      text('This is an AuthFlow test message!!'),
       text('Authflow test message, keep those passwords safe!!!!!'),
     ]);
   }

@@ -47,7 +47,7 @@ export const Header = ({
     <HeaderWrapper>
       <LogoWrapper>
         <SnapLogo color={theme.colors.icon?.default} size={36} />
-        <Title>authflow-snap</Title>
+        <Title>AuthFlow</Title>
       </LogoWrapper>
       <RightContainer>
         <Toggle

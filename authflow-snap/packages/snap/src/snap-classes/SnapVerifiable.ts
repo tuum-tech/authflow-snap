@@ -129,9 +129,9 @@ export class SnapVerifiable {
         store: stores,
       };
 
-      const vcKey = 'Sample Authflow Credential';
+      const vcKey = 'Sample AuthFlow Credential';
       const vcValue = {
-        name: `My Sample Authflow Credential`,
+        name: `My Sample AuthFlow Credential`,
       };
 
       const params = {

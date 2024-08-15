@@ -178,7 +178,7 @@ const Index = () => {
   return (
     <Container>
       <Heading>
-        Welcome to <Span>authflow</Span>
+        Welcome to <Span>AuthFlow</Span>
       </Heading>
       <CardContainer>
         {error && (
@@ -202,7 +202,7 @@ const Index = () => {
             content={{
               title: 'Connect',
               description:
-                'Get started by connecting to and installing authflow.',
+                'Get started by connecting to and installing AuthFlow.',
               button: (
                 <ConnectButton
                   onClick={requestSnap}
