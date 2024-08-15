@@ -9,24 +9,6 @@ import { SnapCrypto } from './SnapCrypto';
 import { SnapVerifiable } from './SnapVerifiable';
 
 export class SnapState {
-  public static async outputCredentialsToConsole() {
-    try {
-      const credentials = await SnapState.getCredentials();
-
-      if (credentials) {
-        Object.entries(credentials).forEach(([key, item]) => {
-          console.log(`Key: ${key}, Item: ${JSON.stringify(item)}`);
-        });
-      } else {
-        console.log('No credentials found.');
-      }
-    } catch (error) {
-      const errorMessage =
-        error instanceof Error ? error.message : 'An unknown error occurred';
-      console.error(`Error in outputCredentialsToConsole: ${errorMessage}`);
-    }
-  }
-
   public static async getCredentials() {
     try {
       const credentials = await snap.request({
@@ -372,15 +354,12 @@ export class SnapState {
 
       if (identifyCredentials && identifyIds && authflowCredentials) {
         await this.updateCredentials(identifyIds, authflowCredentials);
-        await this.outputCredentialsToConsole();
         authflowCredentials = await this.getCredentials();
         await this.removeObsoleteCredentials(
           authflowCredentials,
           identifyIdSet,
         );
       }
-
-      await this.outputCredentialsToConsole();
     } catch (error: unknown) {
       const errorMessage =
         error instanceof Error ? error.message : 'An unknown error occurred';

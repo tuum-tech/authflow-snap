@@ -190,10 +190,6 @@ export const onHomePage: OnHomePageHandler = async () => {
         value: 'Sync With Identify',
         name: 'btn-home-sync',
       }),
-      button({
-        value: 'Output Credentials To Console',
-        name: 'btn-home-debug',
-      }),
     ]),
   };
 };
@@ -345,9 +341,6 @@ export const onUserInput: OnUserInputHandler = async ({ id, event }) => {
               : 'An unknown error occurred';
           console.error(`Error in synchronizing: ${errorMessage}`);
         }
-        break;
-      case 'btn-home-debug':
-        result = await SnapState.outputCredentialsToConsole();
         break;
       case 'btn-home-vc-rename': {
         const vcId = await snap.request({
