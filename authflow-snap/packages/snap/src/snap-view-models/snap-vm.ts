@@ -19,7 +19,7 @@ export class SnapViewModels {
     return panel([
       copyable(`Hello, **${origin}**!`),
       text('This is an AuthFlow test message!!'),
-      text('Authflow test message, keep those passwords safe!!!!!'),
+      text('AuthFlow test message, keep those passwords safe!!!!!'),
     ]);
   }
 
