@@ -17,7 +17,7 @@ import type {
 export class SnapViewModels {
   public static helloViewModel(origin: string): Panel {
     return panel([
-      text(`Hello, **${origin}**!`),
+      copyable(`Hello, **${origin}**!`),
       text('This is an authflow test message!!'),
       text('Authflow test message, keep those passwords safe!!!!!'),
     ]);
@@ -54,7 +54,7 @@ export class SnapViewModels {
   ): Panel {
     return panel([
       heading(`Send login for ${description}`),
-      text(
+      copyable(
         `Are you sure you want to send the login for ${description} to ${site}?`,
       ),
     ]);
@@ -66,7 +66,7 @@ export class SnapViewModels {
   ): Panel {
     return panel([
       heading(`Send verifiable credential for ${description}`),
-      text(
+      copyable(
         `Are you sure you want to send the verifiable credential for ${description} to ${site}?`,
       ),
     ]);
@@ -80,7 +80,7 @@ export class SnapViewModels {
       heading(
         `Create verifiable presentation for verifiable credential(s) ${description}`,
       ),
-      text(
+      copyable(
         `Are you sure you want to create a verifiable presentation for ${description} and send to ${site}?`,
       ),
     ]);
