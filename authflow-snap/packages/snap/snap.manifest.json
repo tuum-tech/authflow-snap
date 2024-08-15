@@ -1,7 +1,7 @@
 {
   "version": "0.1.1",
   "description": "AuthFlow: a credentials management MetaMask snap in Typescript.",
-  "proposedName": "Authflow",
+  "proposedName": "AuthFlow",
   "repository": {
     "type": "git",
     "url": "https://github.com/tuum-tech/authflow-snap.git"
