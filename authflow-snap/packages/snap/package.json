@@ -1,6 +1,7 @@
 {
-  "name": "snap",
+  "name": "@tuum-tech/authflow-snap",
   "version": "0.1.1",
+  "private": true,
   "description": "AuthFlow: A credentials management snap written in Typescript.",
   "repository": {
     "type": "git",
@@ -9,8 +10,14 @@
   "license": "(MIT-0 OR Apache-2.0)",
   "main": "./dist/bundle.js",
   "files": [
-    "dist/",
-    "snap.manifest.json"
+    "dist",
+    "src",
+    "snap.config.ts",
+    "snap.manifest.json",
+    "package.json",
+    "images",
+    "README.md",
+    "CHANGELOG.md"
   ],
   "scripts": {
     "allow-scripts": "yarn workspace root allow-scripts",
