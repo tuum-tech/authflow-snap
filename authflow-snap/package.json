@@ -1,18 +1,22 @@
 {
-  "name": "root",
-  "version": "0.1.0",
-  "private": true,
-  "description": "",
-  "homepage": "https://github.com/MetaMask/template-snap-monorepo#readme",
+  "name": "@tuum-tech/authflow-snap",
+  "version": "0.1.1",
+  "description": "AuthFlow: A credentials management snap written in Typescript.",
+  "homepage": "https://github.com/tuum-tech/authflow-snap/#readme",
   "bugs": {
-    "url": "https://github.com/MetaMask/template-snap-monorepo/issues"
+    "url": "https://github.com/tuum-tech/authflow-snap/issues"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/MetaMask/template-snap-monorepo.git"
+    "url": "https://github.com/tuum-tech/authflow-snap.git"
   },
+  "keywords": [
+  "authentication",
+  "verifiable credentials",
+  "snaps"
+],
+  "author": "Tuum Technologies",
   "license": "(MIT-0 OR Apache-2.0)",
-  "author": "",
   "workspaces": [
     "packages/*"
   ],
