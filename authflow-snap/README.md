@@ -9,7 +9,9 @@ MetaMask Snaps is a system that allows anyone to safely expand the capabilities 
 ### Setup the development environment
 
 ```shell
-yarn install && yarn start
+yarn install
+cd packages
+yarn start
 ```
 
 ## Contributing

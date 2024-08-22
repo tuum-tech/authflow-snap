@@ -7,11 +7,12 @@
     "url": "https://github.com/tuum-tech/authflow-snap.git"
   },
   "source": {
-    "shasum": "kICq6SHf7NOAUwnr3h0a5tKIB2VnIyI6V2y10gD2F/U=",
+    "shasum": "UtinJsUM6dM8vZkfPJ5c/9Fsxg4/FcbsJsinFmnQet8=",
     "location": {
       "npm": {
         "filePath": "dist/bundle.js",
-        "packageName": "snap",
+        "iconPath": "images/icon.svg",
+        "packageName": "@tuum-tech/authflow-snap",
         "registry": "https://registry.npmjs.org/"
       }
     }
