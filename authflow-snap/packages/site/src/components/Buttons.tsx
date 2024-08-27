@@ -113,7 +113,7 @@ export const GetVerifiableCredsButton = (
 export const CreateVerifiablePresentationButton = (
   props: ComponentProps<typeof Button>,
 ) => {
-  return <Button {...props}>Generate Verified Presentation</Button>;
+  return <Button {...props}>Generate Verifiable Presentation</Button>;
 };
 
 export const BasicCredsDisplay = forwardRef((props, ref) => {
