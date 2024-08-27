@@ -161,29 +161,29 @@ export const onHomePage: OnHomePageHandler = async () => {
       }),
       divider(),
       button({
-        value: 'Get All Verified Credentials',
+        value: 'Get All Verifiable Credentials',
         name: 'btn-home-vc-show',
       }),
       button({
-        value: 'Delete All Verified Credentials',
+        value: 'Delete All Verifiable Credentials',
         name: 'btn-home-vc-delete-all',
       }),
       button({
-        value: 'Delete One Verified Credential',
+        value: 'Delete One Verifiable Credential',
         name: 'btn-home-vc-delete-one',
       }),
       button({
-        value: 'Rename Verified Credential',
+        value: 'Rename Verifiable Credential',
         name: 'btn-home-vc-rename',
       }),
       divider(),
       button({
-        value: 'Create Verified Presentation',
+        value: 'Create Verifiable Presentation',
         name: 'btn-home-vp-create',
       }),
       divider(),
       button({
-        value: 'Create Sample Verified Credential',
+        value: 'Create Sample Verifiable Credential',
         name: 'btn-home-vc-sample-create',
       }),
       button({

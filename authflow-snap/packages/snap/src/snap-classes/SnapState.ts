@@ -225,6 +225,7 @@ export class SnapState {
       let returnCredentials;
 
       if (credentials) {
+        let found = false;
         for (const value of Object.values(credentials)) {
           const snapCredential = value as SnapCredential;
 
@@ -235,13 +236,15 @@ export class SnapState {
                 username: credData.username,
                 password: credData.password,
               };
+              found = true;
               break;
             } else {
               throw new Error('Not a basic credential.');
             }
-          } else {
-            throw new Error('Credential not found.');
           }
+        }
+        if (!found) {
+          throw new Error('Credential not found.');
         }
       } else {
         throw new Error('Credentials undefined.');

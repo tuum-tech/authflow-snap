@@ -117,8 +117,8 @@ export const CreateVerifiablePresentationButton = (
 };
 
 export const BasicCredsDisplay = forwardRef((props, ref) => {
-  const [user, setUser] = useState<string>('Loading...');
-  const [password, setPassword] = useState<string>('Loading...');
+  const [user, setUser] = useState<string>('');
+  const [password, setPassword] = useState<string>('');
   const [description, setDescription] = useState<string>('');
 
   useImperativeHandle(ref, () => ({
