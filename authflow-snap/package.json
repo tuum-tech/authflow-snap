@@ -1,7 +1,12 @@
 {
   "name": "@tuum-tech/authflow-snap-monorepo",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "AuthFlow: A credentials management snap written in Typescript.",
+  "keywords": [
+    "authentication",
+    "verifiable credentials",
+    "snaps"
+  ],
   "homepage": "https://github.com/tuum-tech/authflow-snap/#readme",
   "bugs": {
     "url": "https://github.com/tuum-tech/authflow-snap/issues"
@@ -10,13 +15,8 @@
     "type": "git",
     "url": "https://github.com/tuum-tech/authflow-snap.git"
   },
-  "keywords": [
-    "authentication",
-    "verifiable credentials",
-    "snaps"
-  ],
-  "author": "Tuum Technologies",
   "license": "(MIT-0 OR Apache-2.0)",
+  "author": "Tuum Technologies",
   "workspaces": [
     "packages/*"
   ],
@@ -28,6 +28,10 @@
     "lint:misc": "prettier '**/*.json' '**/*.md' '!**/CHANGELOG.md' '**/*.yml' --ignore-path .gitignore",
     "start": "yarn workspaces foreach --parallel --interlaced --verbose run start",
     "test": "yarn workspace snap run test"
+  },
+  "dependencies": {
+    "@metamask/keyring-api": "^8.0.1",
+    "did-jwt-vc": "^4.0.4"
   },
   "devDependencies": {
     "@lavamoat/allow-scripts": "^3.0.0",
@@ -60,9 +64,5 @@
       "@lavamoat/preinstall-always-fail": false,
       "sharp": true
     }
-  },
-  "dependencies": {
-    "@metamask/keyring-api": "^8.0.1",
-    "did-jwt-vc": "^4.0.4"
   }
 }

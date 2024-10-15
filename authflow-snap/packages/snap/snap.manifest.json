@@ -1,5 +1,5 @@
 {
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "AuthFlow: a credentials management MetaMask snap in Typescript.",
   "proposedName": "AuthFlow",
   "repository": {
@@ -7,7 +7,7 @@
     "url": "https://github.com/tuum-tech/authflow-snap.git"
   },
   "source": {
-    "shasum": "4kTm+RM8bwCfpZTF5S1PntkcQkoH+egfoUj/KiQsKjY=",
+    "shasum": "a7WanCudd/6LRniEiou/pTQHnyb8/sJdOdsERE1k+Bg=",
     "location": {
       "npm": {
         "filePath": "dist/bundle.js",
