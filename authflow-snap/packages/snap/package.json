@@ -1,6 +1,6 @@
 {
   "name": "@tuum-tech/authflow-snap",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "AuthFlow: A credentials management snap written in Typescript.",
   "repository": {
     "type": "git",

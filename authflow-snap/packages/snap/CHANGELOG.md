@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.1.3](https://github.com/hashgraph/hedera-metamask-snaps/compare/v0.1.3...v0.1.3)
+
+### :page_with_curl: Documentation
+
+- Refer to the [AuthFlow Snap Wiki](https://github.com/tuum-tech/authflow-snap/wiki) for more info on how the snap works and how to integrate it into your own application.
+
+### :rocket: Features
+
+- Updated the logo to have a different background
+
+### :bug: Bug Fixes
+
 ## [0.1.2](https://github.com/hashgraph/hedera-metamask-snaps/compare/v0.1.2...v0.1.2)
 
 ### :page_with_curl: Documentation
