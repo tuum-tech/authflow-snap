@@ -1,6 +1,6 @@
 # Changelog
 
-## [0.1.3](https://github.com/tuum-tech/authflow-snap/compare/v0.1.2...v0.1.3)
+## [0.1.4](https://github.com/tuum-tech/authflow-snap/compare/v0.1.2...v0.1.4)
 
 ### :page_with_curl: Documentation
 
