@@ -1,6 +1,6 @@
 # Changelog
 
-## [0.1.3](https://github.com/hashgraph/hedera-metamask-snaps/compare/v0.1.3...v0.1.3)
+## [0.1.3](https://github.com/tuum-tech/authflow-snap/compare/v0.1.2...v0.1.3)
 
 ### :page_with_curl: Documentation
 
@@ -12,7 +12,7 @@
 
 ### :bug: Bug Fixes
 
-## [0.1.2](https://github.com/hashgraph/hedera-metamask-snaps/compare/v0.1.2...v0.1.2)
+## [0.1.2](https://github.com/tuum-tech/authflow-snap/compare/v0.1.1...v0.1.2)
 
 ### :page_with_curl: Documentation
 
@@ -24,7 +24,7 @@
 
 ### :bug: Bug Fixes
 
-## [0.1.1](https://github.com/hashgraph/hedera-metamask-snaps/compare/v0.1.1...v0.1.1)
+## [0.1.1](https://github.com/tuum-tech/authflow-snap/compare/v0.1.0...v0.1.1)
 
 ### :page_with_curl: Documentation
 
@@ -39,7 +39,7 @@
 - Audit vulnerability - switching text() to copyable() where user input is included in the dialog
 - Audit vulnerability - removing console.log'ing of credentials in encrypted storage
 
-## [0.1.0](https://github.com/hashgraph/hedera-metamask-snaps/compare/v0.1.0...v0.1.0)
+## [0.1.0](https://github.com/tuum-tech/authflow-snap/compare/v0.1.0...v0.1.0)
 
 ### :page_with_curl: Documentation
 
